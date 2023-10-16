@@ -1,6 +1,7 @@
 export const db = {
     dashboard: [
         {
+            id: "1",
             title: "Title1", prepend: "icon",
             contents: [
                 {
@@ -52,12 +53,12 @@ export const db = {
                 },
             ]
         },
-        { title: "Title2", prepend: "" },
-        { title: "Title1", prepend: "icon" },
-        { title: "Title2", prepend: "" },
-        { title: "Title1", prepend: "icon" },
-        { title: "Title2", prepend: "" },
-        { title: "Title1", prepend: "icon" },
-        { title: "Title2", prepend: "" },
+        { id: "2", title: "Title2", prepend: "" },
+        { id: "3", title: "Title1", prepend: "icon" },
+        { id: "4", title: "Title2", prepend: "" },
+        { id: "5", title: "Title1", prepend: "icon" },
+        { id: "6", title: "Title2", prepend: "" },
+        { id: "7", title: "Title1", prepend: "icon" },
+        { id: "8", title: "Title2", prepend: "" },
     ]
 }

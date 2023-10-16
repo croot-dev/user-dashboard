@@ -8,7 +8,7 @@
       <div class="widget-option">
         <ul>
           <WidgetOptionEdit />
-          <WidgetOptionRemove />
+          <WidgetOptionRemove @remove-widget="emits('remove-widget')" />
         </ul>
       </div>
     </v-card-actions>
@@ -16,7 +16,7 @@
 </template>
 <script setup lang="ts">
 import WidgetOptions from "./WidgetOptions.vue";
-
+const emits = defineEmits(['remove-widget'])
 </script>
 
 <style lang="scss" scoped>

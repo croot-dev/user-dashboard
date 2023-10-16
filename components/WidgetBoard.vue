@@ -41,6 +41,7 @@
             sizeX: item.data.sizeX,
             sizeY: item.data.sizeY,
           }"
+          @remove-widget="removeWidget(item.data.id)"
         >
           <WidgetContentA v-bind="{ ...item.data.content }" />
     </WidgetBox>
@@ -48,31 +49,32 @@
     </GridLayout>
 </template>
 <script setup lang="ts">
+import type { Layout } from 'vue3-grid-layout-next/dist/helpers/utils.d.ts'
 import { toRaw } from 'vue'
   interface IWidget {
-    uuid: String;
-    type: String;
-    sizeX: String;
-    sizeY: String;
-    posX: String;
-    posY: String;
+    uuid: string;
+    type: string;
+    sizeX: string;
+    sizeY: string;
+    posX: string;
+    posY: string;
     content: IWidgetContent
   }
   interface IWidgetContent {
-    title: String;
-    maintext?: String;
-    caption?: String;
-    imagesrc?: String;
+    title: string;
+    maintext?: string;
+    caption?: string;
+    imagesrc?: string;
   }
 
   const props = defineProps<{
-    widgetList: IWidget[]
+    tabData: any;
     mode: Boolean
   }>();
   const emits = defineEmits(['change-edit-mode', 'save-widgets'])
   
-  const { widgetList } = toRefs(props)
-  const layout = ref([]);
+  const widgetList = toRefs<IWidget[]>(props.tabData.contents)
+  const layout = ref<Layout>([]);
   watch(widgetList, (value) => {
     layout.value = value.map((widget, i) => {
       const x = Number(widget.posX);
@@ -80,22 +82,18 @@ import { toRaw } from 'vue'
       const w = Number(widget.sizeX);
       const h = Number(widget.sizeY);
       return {
-        i,
+        i: widget.uuid,
         x,
         y,
         w,
         h,
-        static: false,
-        data: widget
+        static: false
       }
     })
     lastUpdateTime.value = new Date().toISOString()
   })
-  const lastUpdateTime = ref(new Date().toISOString())
-  const save = () => {
-    emits('save-widgets', toRaw(layout.value))
-  }
-  const layoutUpdatedEvent = (newLayout) => {
+  const lastUpdateTime = ref()
+  const layoutUpdatedEvent = (newLayout :Layout) => {
     console.log(toRaw(newLayout))
   }
 
@@ -104,8 +102,24 @@ import { toRaw } from 'vue'
   const toggleMode = () => {
     emits('change-edit-mode', isEditMode)
   }
+
+  const setDashboardList = async (widgets :IWidget) => {
+    const body = { id: props.tabData.id, contents: widgets }
+    const result = await fetch('/api/dashboard', { method: "POST", body: JSON.stringify(body) }).then((res) => res.json())
+    return result
+  }
+  const save = (data) => {
+    return setDashboardList(data);
+  }
   const onClickSave = () => {
-    save()
+    save(layout.value).then((result) => {
+      console.log(result)
+      isEditMode.value = false
+    })
+  }
+  const removeWidget = (id) => {
+    const targetIndex = layout.value.findIndex(item => item.id === id)
+    layout.value.splice(targetIndex,1)
   }
 
 </script>

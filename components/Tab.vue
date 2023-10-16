@@ -15,9 +15,11 @@
 </template>
 <script setup lang="ts">
 const data = defineProps<{
+  id: String;
   title: String;
   prepend?: String | Component;
   append?: String | Component;
+  contents?: any[]
 }>();
 </script>
 <style lang="scss" scoped>
