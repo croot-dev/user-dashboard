@@ -1,16 +1,16 @@
 <template>
   <div class="widget" :style="{ backgroundImage: `url(${data.imagesrc})` }">
     <span>{{ data.title }}</span>
-    <div>{{ data.maintext }}</div>
+    <div v-if="'maintext' in data">{{ data.maintext }}</div>
     <span v-if="'caption' in data">{{ data.caption }}</span>
   </div>
 </template>
 <script setup lang="ts">
 const data = defineProps<{
-  title: String;
-  maintext?: String;
-  caption?: String;
-  imagesrc?: String;
+  title: string;
+  maintext?: string;
+  caption?: string;
+  imagesrc?: string;
 }>();
 </script>
 <style lang="scss" scoped>

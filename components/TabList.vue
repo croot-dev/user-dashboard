@@ -11,13 +11,10 @@
   </div>
 </template>
 <script setup lang="ts">
-interface Tab {
-  title: String;
-  prepend?: String;
-  append?: String;
-}
+import { ITab } from '~/types';
+
 const props = defineProps<{
-  tabList: Tab[]
+  tabList: ITab[]
 }>()
 </script>
 <style lang="scss" scoped>

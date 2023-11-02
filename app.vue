@@ -14,6 +14,7 @@
 </template>
 <script setup lang="ts">
 import { toRaw } from 'vue';
+import { ITab, IWidget } from './types';
 
 // handle mode
 const isEditMode = ref(false);
@@ -22,13 +23,10 @@ const changeEditMode = (isEdit: boolean) => {
 }
 
 // handle list data
-const tabList = ref([]);
-const widgetList = ref([]);
+const tabList = ref<ITab[]>([]);
+const widgetList = ref<IWidget<unknown>[]>([]);
 const currentTabIndex = ref<number|null>(null);
-// const currentTab = computed(() => {
-//   return currentTabIndex.value? tabList.value[currentTabIndex.value] : null
-// })
-const currentTab = ref(null)
+const currentTab = ref<ITab | null>(null)
 const getDashboardList = async () => {
   const data = await fetch('/api/dashboard').then((res) => res.json())
   tabList.value = data;
@@ -39,10 +37,10 @@ const getDashboardList = async () => {
 watch(currentTabIndex, (index) => {
   if (index !== null) {
     currentTab.value = tabList.value[index]
-    widgetList.value = toRaw(currentTab.contents)
+    widgetList.value = toRaw(currentTab.value.widgets)
   }
 })
-onMounted(() => { getDashboardList() })
+getDashboardList()
 
 </script>
 <style lang="scss" scoped>
@@ -69,3 +67,4 @@ onMounted(() => { getDashboardList() })
   margin: 12px auto 0;
 }
 </style>
+./types/asdf./types
