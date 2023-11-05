@@ -2,7 +2,7 @@
   <div class="tab-wrapper">
     <div class="tab-list">
       <div v-for="(tabData, i) in tabList" :key="i" class="tab-item">
-        <tab v-bind="{ ...tabData }" />
+        <TabItem v-bind="{ ...tabData }" />
       </div>
     </div>
   </div>

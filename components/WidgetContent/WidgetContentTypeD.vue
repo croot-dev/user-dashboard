@@ -2,7 +2,7 @@
   <PieChart
     :key="height"
     ref="chartRef"
-    :chartData="testData"
+    :chartData="chartData"
     :width="width"
     :height="height"
     :options="{
@@ -13,6 +13,9 @@
 </template>
 <script setup lang="ts">
 import { PieChart } from 'vue-chart-3';
+import type { Chart } from 'chart.js'
+import { ChartData } from 'chart.js'
+const { wealthByAgeGroup } = useDatasetStore();
 
 const data = defineProps<{
   title: string;
@@ -20,17 +23,18 @@ const data = defineProps<{
   height: number;
 }>();
 
-const testData = {
-  labels: ['Paris', 'Nîmes', 'Toulon', 'Perpignan', 'Autre'],
-  datasets: [
-    {
-      data: [30, 40, 60, 70, 5],
-      backgroundColor: ['#77CEFF', '#0079AF', '#123E6B', '#97B0C4', '#A5C8ED'],
-    },
-  ],
-};
+const chartRef = ref<Chart>();
+const chartData: ChartData <'pie', number[]> = reactive({
+  datasets: [{ data: [] }]
+})
+watch(() => wealthByAgeGroup, () => {
+  chartData.datasets = [{
+    label: 'Wealth by age group',
+    data: wealthByAgeGroup.map(i => Number(i.value)),
+  }];
+  chartData.labels = wealthByAgeGroup.map(i => i.name);
+  }, {immediate: true});
 
-const chartRef = ref();
 </script>
 <style lang="scss" scoped>
 .widget {

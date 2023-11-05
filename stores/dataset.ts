@@ -39,7 +39,7 @@ export const useDatasetStore = defineStore('dataset', () => {
   }
 
 
-  const incomeByAgeGroup = computed(() => {
+  const wealthByAgeGroup = computed(() => {
     const result = new Map();
     dataset.value.forEach((row) => {
       if (!row?.demographics?.age) {
@@ -59,5 +59,5 @@ export const useDatasetStore = defineStore('dataset', () => {
     return Array.from(result, ([name, value]) => ({ name: `${name}0대`, value })).sort((a,b) => (a.name > b.name)? 1: -1);
   })
   
-  return { dataset, load, initialized, incomeByAgeGroup }
+  return { dataset, load, initialized, wealthByAgeGroup }
 })

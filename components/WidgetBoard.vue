@@ -1,17 +1,29 @@
 <template>
   <v-row>
     <v-col>
-      Last Updated: {{ lastUpdateTime }}
+      Last Updated: {{ dayjs(lastUpdateTime).format('YYYY-MM-DD HH:mm:ss') }}
+      <v-btn
+        variant="plain"
+        size="small"
+        icon="mdi-refresh-auto"
+        :color="autoReloadColor"
+        @click="toggleAutoReload"
+        />
     </v-col>
     <v-spacer></v-spacer>
-    <v-col>
+    <v-col class="d-flex">
       <v-switch
         v-model="isEditMode"
         :label="isEditMode? 'edit' : 'read'"
-        size="small"
         hide-details
         @change="toggleMode"
-        ></v-switch>
+        />
+      <v-checkbox
+        v-if="isEditMode"
+        v-model="isHideContent"
+        hide-details
+        label="hide content"
+        />
       <v-btn v-if="isEditMode" size="small" @click="onClickSave">Save</v-btn>
     </v-col>
   </v-row>
@@ -24,7 +36,6 @@
     :is-resizable="isEditMode"
     :responsive="false"
     :breakpoints="{}"
-    @layout-updated="layoutUpdatedEvent"
   >
     <GridItem
       v-for="item in layout"
@@ -38,6 +49,7 @@
     >
       <WidgetContainer
         :data="item.data"
+        :hideContent="isEditMode && isHideContent"
         @remove-widget="removeWidget(item.i)"
         />
     </GridItem>
@@ -46,7 +58,9 @@
 <script setup lang="ts">
 import type { Layout, LayoutItem } from 'vue3-grid-layout-next/dist/helpers/utils.d.ts'
 import { toRaw } from 'vue'
-import { IWidget } from '~/types';
+import type { IWidget } from '~/types';
+import dayjs from 'dayjs'
+
   const props = defineProps<{
     tabData: any;
     mode: Boolean
@@ -78,10 +92,32 @@ import { IWidget } from '~/types';
     lastUpdateTime.value = new Date().toISOString()
   }, { immediate: true })
 
+  // handle auto reload
+  const autoReload = ref(0);
+  const autoReloadColor = computed(() => (autoReload.value > 0)? 'primary' : '')
+  const toggleAutoReload = () => {
+    const reloader = () => {
+      autoReload.value = setTimeout(() => {
+          lastUpdateTime.value = new Date().toISOString();
+          reloader();
+        }, 10 * 100);
+    }
+    if (autoReload.value || isEditMode.value) {
+      autoReload.value = clearTimeout(autoReload.value);
+    } else {
+      reloader();
+    }
+  }
+  
+
   // handle mode
   const isEditMode = ref(props.mode)
+  const isHideContent = ref(true)
   const toggleMode = () => {
     emits('change-edit-mode', isEditMode)
+    if (isEditMode.value) {
+      toggleAutoReload();
+    }
   }
 
   const setDashboardList = async (widgets :IWidget<unknown>) => {

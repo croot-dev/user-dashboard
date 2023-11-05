@@ -14,8 +14,9 @@
 <script setup lang="ts">
 import { useDatasetStore } from "@/stores/dataset"
 import { LineChart } from 'vue-chart-3';
+import type { Chart } from 'chart.js'
 import { ChartData } from 'chart.js'
-const { incomeByAgeGroup } = useDatasetStore();
+const { wealthByAgeGroup } = useDatasetStore();
 
 const data = defineProps<{
   title: string;
@@ -23,22 +24,19 @@ const data = defineProps<{
   height: number;
 }>();
 
+const chartRef = ref<Chart>();
 const chartData = reactive<ChartData <'line', {name: string, value: number} []>>({
   datasets: [{ data: [] }]
 })
-const chartRef = ref();
-watch(() => incomeByAgeGroup, () => {
+watch(() => wealthByAgeGroup, () => {
   chartData.datasets = [{
-    label: 'Income by age group',
-    data: incomeByAgeGroup,
+    label: 'Wealth by age group',
+    data: wealthByAgeGroup,
     parsing: {
       xAxisKey: 'name',
       yAxisKey: 'value'
     }
   }];
-  nextTick(() => {
-    console.log(chartData)
-  })
   }, {immediate: true});
 
 </script>

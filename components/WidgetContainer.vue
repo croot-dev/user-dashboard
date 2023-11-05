@@ -1,7 +1,14 @@
 <template>
   <v-card class="widget-box" ref="cardRef" :loading="loading">
     <v-card-item>
-      <component :is="component" v-bind="{...props.data}" :width="cardStyle.width" :height="cardStyle.height"/>
+      <div v-show="hideContent">Widget {{props.data.type}}</div>
+      <component
+        v-if="!hideContent"
+        :is="component"
+        v-bind="{...props.data}"
+        :width="cardStyle.width"
+        :height="cardStyle.height"
+        />
     </v-card-item>
 
     <v-card-actions>
@@ -18,7 +25,11 @@
 import WidgetOptionSetting from "./WidgetOptionSetting.vue";
 import { componentMap } from '~/utils'
 const emits = defineEmits(['remove-widget'])
-const props = defineProps({ data: {}, loading: false })
+const props = defineProps({
+  data: {},
+  loading: false,
+  hideContent: false
+})
 const component = computed(() => componentMap.get(props.data.type))
 const cardRef = ref(null)
 const cardStyle = reactive({

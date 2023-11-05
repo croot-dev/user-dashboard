@@ -14,14 +14,12 @@
   </template>
 </template>
 <script setup lang="ts">
-import { Widget } from '~/types';
 
 const props = defineProps<{
     id: string;
     title: string;
     prepend?: string;
     append?: string;
-    widgets: Widget<unknown>[]
 }>();
 </script>
 <style lang="scss" scoped>
