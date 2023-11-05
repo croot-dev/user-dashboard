@@ -58,6 +58,7 @@ import { IWidget } from '~/types';
   }
   const widgetList = computed<IWidget<unknown>[]>(() => (props.tabData)? toRaw(props.tabData.widgets): [])
   const layout = ref<ExpandLayoutItem[]>([]);
+  const lastUpdateTime = ref('')
   watch(widgetList, (value) => {
     layout.value = value.map((widget, i) => {
       const x = Number(widget.posX);
@@ -75,11 +76,7 @@ import { IWidget } from '~/types';
       }
     })
     lastUpdateTime.value = new Date().toISOString()
-  })
-  const lastUpdateTime = ref()
-  const layoutUpdatedEvent = (newLayout :Layout) => {
-    console.log(toRaw(newLayout))
-  }
+  }, { immediate: true })
 
   // handle mode
   const isEditMode = ref(props.mode)

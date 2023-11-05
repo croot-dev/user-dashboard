@@ -20,8 +20,12 @@
   },
   "dependencies": {
     "@mdi/font": "^7.3.67",
+    "@nuxt/content": "^2.9.0",
+    "@pinia/nuxt": "^0.5.1",
     "chart.js": "^4.4.0",
     "dayjs": "^1.11.10",
+    "papaparse": "^5.4.1",
+    "pinia": "^2.1.7",
     "vue-chart-3": "^3.1.8",
     "vue3-grid-layout-next": "^1.0.6"
   }

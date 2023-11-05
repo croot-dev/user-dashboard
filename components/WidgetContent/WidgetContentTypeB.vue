@@ -2,7 +2,7 @@
   <LineChart
     :key="height"
     ref="chartRef"
-    :chartData="testData"
+    :chartData="chartData"
     :width="width"
     :height="height"
     :options="{
@@ -12,7 +12,10 @@
     />
 </template>
 <script setup lang="ts">
+import { useDatasetStore } from "@/stores/dataset"
 import { LineChart } from 'vue-chart-3';
+import { ChartData } from 'chart.js'
+const { incomeByAgeGroup } = useDatasetStore();
 
 const data = defineProps<{
   title: string;
@@ -20,17 +23,24 @@ const data = defineProps<{
   height: number;
 }>();
 
-const testData = {
-  labels: ['Paris', 'Nîmes', 'Toulon', 'Perpignan', 'Autre'],
-  datasets: [
-    {
-      data: [30, 40, 60, 70, 5],
-      backgroundColor: ['#77CEFF', '#0079AF', '#123E6B', '#97B0C4', '#A5C8ED'],
-    },
-  ],
-};
-
+const chartData = reactive<ChartData <'line', {name: string, value: number} []>>({
+  datasets: [{ data: [] }]
+})
 const chartRef = ref();
+watch(() => incomeByAgeGroup, () => {
+  chartData.datasets = [{
+    label: 'Income by age group',
+    data: incomeByAgeGroup,
+    parsing: {
+      xAxisKey: 'name',
+      yAxisKey: 'value'
+    }
+  }];
+  nextTick(() => {
+    console.log(chartData)
+  })
+  }, {immediate: true});
+
 </script>
 <style lang="scss" scoped>
 .widget {

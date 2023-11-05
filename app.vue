@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div class="wrapper" v-if="datasetLoaded">
     <TabList :tabList="tabList">
       <template #content>
         <div class="widget-condition">
@@ -15,6 +15,7 @@
 <script setup lang="ts">
 import { toRaw } from 'vue';
 import { ITab, IWidget } from './types';
+import { useDatasetStore } from '@/stores/dataset'
 
 // handle mode
 const isEditMode = ref(false);
@@ -34,13 +35,19 @@ const getDashboardList = async () => {
     currentTabIndex.value = 0;
   }
 }
+getDashboardList()
 watch(currentTabIndex, (index) => {
   if (index !== null) {
     currentTab.value = tabList.value[index]
     widgetList.value = toRaw(currentTab.value.widgets)
   }
 })
-getDashboardList()
+
+const dataset = useDatasetStore();
+const datasetLoaded = computed(() => dataset.initialized)
+if (!dataset.initialized) {
+  dataset.load();
+}
 
 </script>
 <style lang="scss" scoped>

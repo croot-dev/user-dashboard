@@ -1,7 +1,7 @@
 <template>
   <div class="widget" :style="{ backgroundImage: `url(${data.imagesrc})` }">
     <span>{{ data.title }}</span>
-    <div v-if="'maintext' in data">{{ data.maintext }}</div>
+    <h2 v-if="'maintext' in data">{{ data.maintext }}</h2>
     <span v-if="'caption' in data">{{ data.caption }}</span>
   </div>
 </template>
@@ -18,5 +18,9 @@ const data = defineProps<{
   width: 100%;
   height: 100%;
   background: #fff center/cover no-repeat;
+  text-align: center;
+
+  h2 {}
+  span {}
 }
 </style>

@@ -8,3 +8,8 @@ export const componentMap = new Map([
     ['C', WidgetContentTypeC],
     ['D', WidgetContentTypeD],
 ])
+
+
+export const toSnakeCase = (str) => {
+    return str.replace(/ /g,'_').replace(/([A-Z])/g, ($1) => ("_"+$1.toLowerCase()));
+   };
