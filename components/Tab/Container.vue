@@ -11,7 +11,8 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ITab } from '~/types';
+import type { ITab } from '~/types';
+import TabItem from './Item.vue'
 
 const props = defineProps<{
   tabList: ITab[]

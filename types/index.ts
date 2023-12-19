@@ -1,16 +1,9 @@
-export interface ITab {
-    id: string;
-    title: string;
-    prepend?: string;
-    append?: string;
-    widgets: Widget<unknown>[]
-}
 
 interface WidgetContent {
     title: string;
 }
 
-type WidgetType = 'A' | 'B';
+export type WidgetType = 'A' | 'B' | 'C' | 'D';
 
 export interface IWidget<T> {
     uuid: string;
@@ -26,4 +19,12 @@ export interface ContentTypeA extends WidgetContent {
     maintext: string;
     caption: string;
     imagesrc: string;
+}
+
+export interface ITab {
+    id: string;
+    title: string;
+    prepend?: string;
+    append?: string;
+    widgets: IWidget<unknown>[]
 }

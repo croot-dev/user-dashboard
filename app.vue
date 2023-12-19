@@ -1,21 +1,22 @@
 <template>
   <div class="wrapper" v-if="datasetLoaded">
-    <TabList :tabList="tabList">
+    <TabContainer :tabList="tabList">
       <template #content>
         <div class="widget-condition">
-          <WidgetConditions @changeEditMode="changeEditMode" />
+          <DashboardContainerOptions @changeEditMode="changeEditMode" />
         </div>
         <div class="widget-board">
-          <WidgetBoard :mode="isEditMode" :tabData="currentTab" />
+          <DashboardContainer :mode="isEditMode" :tabData="currentTab" />
         </div>
       </template>
-    </TabList>
+    </TabContainer>
   </div>
 </template>
 <script setup lang="ts">
 import { toRaw } from 'vue';
-import { ITab, IWidget } from './types';
-import { useDatasetStore } from '@/stores/dataset'
+import type { ITab, IWidget } from '@/types';
+import { useDatasetStore } from '~/stores/dataset'
+
 
 // handle mode
 const isEditMode = ref(false);

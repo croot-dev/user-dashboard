@@ -58,8 +58,8 @@
 <script setup lang="ts">
 import type { Layout, LayoutItem } from 'vue3-grid-layout-next/dist/helpers/utils.d.ts'
 import { toRaw } from 'vue'
-import type { IWidget } from '~/types';
 import dayjs from 'dayjs'
+import type { IWidget } from '~/types';
 
   const props = defineProps<{
     tabData: any;

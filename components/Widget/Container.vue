@@ -22,15 +22,16 @@
   </v-card>
 </template>
 <script setup lang="ts">
-import WidgetOptionSetting from "./WidgetOptionSetting.vue";
-import { componentMap } from '~/utils'
+import WidgetOptionSetting from "./OptionSetting.vue";
+import WidgetOptionRemove from "./OptionRemove.vue";
+import { getWidgetComponent } from '~/utils';
 const emits = defineEmits(['remove-widget'])
 const props = defineProps({
   data: {},
   loading: false,
   hideContent: false
 })
-const component = computed(() => componentMap.get(props.data.type))
+const component = computed(() => getWidgetComponent(props.data.type))
 const cardRef = ref(null)
 const cardStyle = reactive({
   width: 0,

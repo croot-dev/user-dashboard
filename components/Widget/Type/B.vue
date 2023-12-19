@@ -2,7 +2,7 @@
   <LineChart
     :key="height"
     ref="chartRef"
-    :chartData="chartData"
+    :chartData="(chartData as unknown as ChartData<'line'>)"
     :width="width"
     :height="height"
     :options="{
@@ -12,7 +12,7 @@
     />
 </template>
 <script setup lang="ts">
-import { useDatasetStore } from "@/stores/dataset"
+import { useDatasetStore } from "~/stores/dataset";
 import { LineChart } from 'vue-chart-3';
 import type { Chart } from 'chart.js'
 import { ChartData } from 'chart.js'
