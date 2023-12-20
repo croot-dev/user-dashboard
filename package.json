@@ -7,19 +7,36 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "lint": "eslint \"**/*.{ts,tsx,vue,js}\" --fix",
+    "lint-eslint": "eslint --ignore-path .gitignore **/*.{ts,vue} --fix"
   },
   "engines": {
     "node": ">=18.9.0"
   },
   "packageManager": "yarn@1.22.19",
   "devDependencies": {
-    "@nuxt/devtools": "latest",
+    "@babel/eslint-parser": "^7.23.3",
+    "@nuxt/devtools": "^1.0.6",
+    "@nuxtjs/eslint-config-typescript": "^12.1.0",
+    "@nuxtjs/eslint-module": "^4.1.0",
+    "@types/papaparse": "^5.3.14",
+    "@typescript-eslint/eslint-plugin": "^6.4.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "eslint": "^8.0.1",
+    "eslint-plugin-check-file": "^2.6.2",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-nuxt": "^4.0.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-vue": "^9.19.2",
     "nuxt": "^3.7.4",
     "sass": "^1.69.3",
+    "typescript": "^5.3.3",
+    "vite-plugin-eslint": "^1.8.1",
     "vite-plugin-vuetify": "^1.0.2",
     "vue": "^3.3.4",
     "vue-router": "^4.2.5",
+    "vue-tsc": "^1.8.25",
     "vuetify": "^3.3.21"
   },
   "dependencies": {

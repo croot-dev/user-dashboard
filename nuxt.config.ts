@@ -1,14 +1,15 @@
 import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
-import { resolve } from 'path'
+import eslintPlugin from 'vite-plugin-eslint'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   ssr: false,
   devtools: { enabled: true },
   build: {
-    transpile: ['vuetify'],
+    transpile: ['vuetify']
   },
   modules: [
+    // '@nuxtjs/eslint-module',
     '@nuxt/content',
     '@pinia/nuxt',
     (_options, nuxt) => {
@@ -16,23 +17,26 @@ export default defineNuxtConfig({
         // @ts-expect-error
         config.plugins.push(vuetify({ autoImport: true }))
       })
-    },
-    //...
+    }
+    // ...
   ],
   vite: {
     vue: {
       template: {
-        transformAssetUrls,
+        transformAssetUrls
       }
     },
+    plugins: [eslintPlugin()]
   },
-  plugins: [
-    {src: '~/plugins/vue3-grid-layout-next', mode: 'client'},
-  ],
+  typescript: {
+    strict: true
+  },
+  plugins: [{ src: '~/plugins/vue3-grid-layout-next', mode: 'client' }],
   runtimeConfig: {
-    redis: { // Default values
+    redis: {
+      // Default values
       host: '',
-      port: 0,
+      port: 0
       /* other redis connector options */
     }
   }

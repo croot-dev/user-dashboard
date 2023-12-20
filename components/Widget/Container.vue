@@ -1,51 +1,66 @@
 <template>
-  <v-card class="widget-box" ref="cardRef" :loading="loading">
-    <v-card-item>
-      <div v-show="hideContent">Widget {{props.data.type}}</div>
+  <VCard
+    ref="cardRef"
+    class="widget-box"
+    :loading="loading"
+  >
+    <VCardItem>
+      <div v-show="hideContent">
+        Widget {{ props.data.type }}
+      </div>
       <component
-        v-if="!hideContent"
         :is="component"
-        v-bind="{...props.data}"
+        v-if="!hideContent"
+        v-bind="{ ...props.data }"
         :width="cardStyle.width"
         :height="cardStyle.height"
-        />
-    </v-card-item>
+      />
+    </VCardItem>
 
-    <v-card-actions>
+    <VCardActions>
       <div class="widget-option">
         <ul>
           <WidgetOptionSetting />
           <WidgetOptionRemove @remove-widget="emits('remove-widget')" />
         </ul>
       </div>
-    </v-card-actions>
-  </v-card>
+    </VCardActions>
+  </VCard>
 </template>
 <script setup lang="ts">
-import WidgetOptionSetting from "./OptionSetting.vue";
-import WidgetOptionRemove from "./OptionRemove.vue";
+import type { VCard } from 'vuetify/lib/components/index.mjs';
+import WidgetOptionSetting from './OptionSetting.vue';
+import WidgetOptionRemove from './OptionRemove.vue';
 import { getWidgetComponent } from '~/utils';
-const emits = defineEmits(['remove-widget'])
-const props = defineProps({
-  data: {},
+import type { WidgetType } from '~/types';
+const emits = defineEmits(['remove-widget']);
+const props = withDefaults(defineProps<{
+  data: {
+    title: string,
+    type: WidgetType
+  };
+  loading?: boolean;
+  hideContent?: boolean;
+}>(), {
   loading: false,
   hideContent: false
-})
-const component = computed(() => getWidgetComponent(props.data.type))
-const cardRef = ref(null)
+});
+const component = computed(() => getWidgetComponent(props.data.type));
+const cardRef = shallowRef<VCard>();
 const cardStyle = reactive({
   width: 0,
   height: 0
-})
+});
 
 onMounted(() => {
   // Grid 적용으로 인한 강제 제어 순서 변경
   nextTick(() => {
-    cardStyle.width = cardRef?.value.$el.getBoundingClientRect().width
-    cardStyle.height = cardRef?.value.$el.getBoundingClientRect().height
-  })
-})
-
+    if (cardRef.value) {
+      cardStyle.width = cardRef.value.$el.getBoundingClientRect().width;
+      cardStyle.height = cardRef.value.$el.getBoundingClientRect().height;
+    }
+  });
+});
 </script>
 
 <style lang="scss" scoped>
@@ -61,7 +76,7 @@ onMounted(() => {
     flex: 1 1 auto;
   }
   .v-card-actions {
-    flex: 0 0 30px
+    flex: 0 0 30px;
   }
 
   .widget-option {
@@ -76,9 +91,7 @@ onMounted(() => {
       list-style: none;
     }
     li {
-      
     }
   }
-
 }
 </style>

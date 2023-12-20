@@ -2,32 +2,31 @@
   <LineChart
     :key="height"
     ref="chartRef"
-    :chartData="(chartData as unknown as ChartData<'line'>)"
+    :chart-data="(chartData as unknown as ChartDataType<'line'>)"
     :width="width"
     :height="height"
     :options="{
       responsive: true,
       maintainAspectRatio: false
     }"
-    />
+  />
 </template>
 <script setup lang="ts">
-import { useDatasetStore } from "~/stores/dataset";
 import { LineChart } from 'vue-chart-3';
-import type { Chart } from 'chart.js'
-import { ChartData } from 'chart.js'
+import type { Chart, ChartData as ChartDataType } from 'chart.js';
+import { useDatasetStore } from '~/stores/dataset';
 const { wealthByAgeGroup } = useDatasetStore();
 
-const data = defineProps<{
+defineProps<{
   title: string;
   width: number;
   height: number;
 }>();
 
 const chartRef = ref<Chart>();
-const chartData = reactive<ChartData <'line', {name: string, value: number} []>>({
+const chartData = reactive<ChartDataType <'line', {name: string, value: number} []>>({
   datasets: [{ data: [] }]
-})
+});
 watch(() => wealthByAgeGroup, () => {
   chartData.datasets = [{
     label: 'Wealth by age group',
@@ -37,7 +36,7 @@ watch(() => wealthByAgeGroup, () => {
       yAxisKey: 'value'
     }
   }];
-  }, {immediate: true});
+}, { immediate: true });
 
 </script>
 <style lang="scss" scoped>

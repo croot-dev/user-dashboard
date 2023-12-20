@@ -7,16 +7,16 @@
     </div>
   </div>
   <div class="content-wrapper">
-    <slot name="content"></slot>
+    <slot name="content" />
   </div>
 </template>
 <script setup lang="ts">
+import TabItem from './Item.vue';
 import type { ITab } from '~/types';
-import TabItem from './Item.vue'
 
-const props = defineProps<{
+defineProps<{
   tabList: ITab[]
-}>()
+}>();
 </script>
 <style lang="scss" scoped>
 .tab-wrapper {

@@ -2,7 +2,10 @@
   <v-form>
     <v-container>
       <v-row>
-        <v-col cols="12" md="4">
+        <v-col
+          cols="12"
+          md="4"
+        >
           <v-text-field
             v-model="conditionValues.startDate"
             :rules="[]"
@@ -11,10 +14,13 @@
             required
             single-line
             hide-details
-          ></v-text-field>
+          />
         </v-col>
 
-        <v-col cols="12" md="4">
+        <v-col
+          cols="12"
+          md="4"
+        >
           <v-text-field
             v-model="conditionValues.endDate"
             :rules="[]"
@@ -23,17 +29,27 @@
             required
             single-line
             hide-details
-          ></v-text-field>
+          />
         </v-col>
 
-        <v-spacer></v-spacer>
+        <v-spacer />
 
-        <v-col cols="12" md="3">
-          <v-btn size="small" color="success" @click="validate">
-            <v-icon icon="mdi-magnify"></v-icon>
+        <v-col
+          cols="12"
+          md="3"
+        >
+          <v-btn
+            size="small"
+            color="success"
+            @click="validate"
+          >
+            <v-icon icon="mdi-magnify" />
           </v-btn>
-          <v-btn size="small" @click="resetConditionValues">
-            <v-icon icon="mdi-eraser"></v-icon>
+          <v-btn
+            size="small"
+            @click="resetConditionValues"
+          >
+            <v-icon icon="mdi-eraser" />
           </v-btn>
         </v-col>
       </v-row>
@@ -41,30 +57,31 @@
   </v-form>
 </template>
 <script setup lang="ts">
-import dayjs from "dayjs";
-const emits = defineEmits(['update:value'])
+import dayjs from 'dayjs';
+const emits = defineEmits(['update:value']);
 const today = dayjs();
 const conditionValues = reactive({
-  startDate: "",
-  endDate: "",
+  startDate: '',
+  endDate: ''
 });
 const resetConditionValues = () => {
-  conditionValues.startDate = today.subtract(1, "month").format("YYYY-MM-DD")
-  conditionValues.endDate = today.format("YYYY-MM-DD")
-}
+  conditionValues.startDate = today.subtract(1, 'month').format('YYYY-MM-DD');
+  conditionValues.endDate = today.format('YYYY-MM-DD');
+};
 const validate = () => {
-  if (true) {
+  const example = 0 + 1 === 1;
+  if (example) {
     submit();
   }
   return false;
 };
 const submit = () => {
   emits('update:value', conditionValues);
-}
+};
 
 onMounted(() => {
-  resetConditionValues()
-})
+  resetConditionValues();
+});
 </script>
 <style lang="scss" scoped>
 </style>

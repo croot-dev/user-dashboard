@@ -1,7 +1,9 @@
 <template>
   <div class="widget" :style="{ backgroundImage: `url(${data.imagesrc})` }">
     <span>{{ data.title }}</span>
-    <h2 v-if="'maintext' in data">{{ data.maintext }}</h2>
+    <h2 v-if="'maintext' in data">
+      {{ data.maintext }}
+    </h2>
     <span v-if="'caption' in data">{{ data.caption }}</span>
   </div>
 </template>

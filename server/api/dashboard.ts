@@ -1,10 +1,10 @@
-import { db } from "../db/"
+import { db } from '../db/'
 
 export default defineEventHandler(async (event) => {
   switch (event.node.req.method) {
-    case "GET":
+    case 'GET':
       return db.dashboard
-    case "POST":
+    case 'POST':
       const body = await readBody(event).then(x => JSON.parse(x));
       const targetId = db.dashboard.findIndex(item => item.id === body.id)
       if (targetId > -1) {

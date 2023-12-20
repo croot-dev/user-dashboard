@@ -1,4 +1,3 @@
-
 interface WidgetContent {
     title: string;
 }

@@ -14,11 +14,12 @@
   </template>
 </template>
 <script setup lang="ts">
+
 const props = defineProps<{
-    id: string;
-    title: string;
-    prepend?: string;
-    append?: string;
+  id: string;
+  title: string;
+  prepend?: string;
+  append?: string;
 }>();
 </script>
 <style lang="scss" scoped>

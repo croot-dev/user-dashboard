@@ -1,12 +1,12 @@
 <template>
-  <div class="wrapper" v-if="datasetLoaded">
-    <TabContainer :tabList="tabList">
+  <div v-if="datasetLoaded" class="wrapper">
+    <TabContainer :tab-list="tabList">
       <template #content>
         <div class="widget-condition">
-          <DashboardContainerOptions @changeEditMode="changeEditMode" />
+          <DashboardContainerOptions @change-edit-mode="changeEditMode" />
         </div>
         <div class="widget-board">
-          <DashboardContainer :mode="isEditMode" :tabData="currentTab" />
+          <DashboardContainer :mode="isEditMode" :tab-data="currentTab" />
         </div>
       </template>
     </TabContainer>
@@ -15,37 +15,36 @@
 <script setup lang="ts">
 import { toRaw } from 'vue';
 import type { ITab, IWidget } from '@/types';
-import { useDatasetStore } from '~/stores/dataset'
-
+import { useDatasetStore } from '~/stores/dataset';
 
 // handle mode
 const isEditMode = ref(false);
 const changeEditMode = (isEdit: boolean) => {
-  isEditMode.value = isEdit
-}
+  isEditMode.value = isEdit;
+};
 
 // handle list data
 const tabList = ref<ITab[]>([]);
 const widgetList = ref<IWidget<unknown>[]>([]);
 const currentTabIndex = ref<number|null>(null);
-const currentTab = ref<ITab | null>(null)
+const currentTab = ref<ITab | null>(null);
 const getDashboardList = async () => {
-  const data = await fetch('/api/dashboard').then((res) => res.json())
+  const data = await fetch('/api/dashboard').then(res => res.json());
   tabList.value = data;
   if (data.length > 0) {
     currentTabIndex.value = 0;
   }
-}
-getDashboardList()
+};
+getDashboardList();
 watch(currentTabIndex, (index) => {
   if (index !== null) {
-    currentTab.value = tabList.value[index]
-    widgetList.value = toRaw(currentTab.value.widgets)
+    currentTab.value = tabList.value[index];
+    widgetList.value = toRaw(currentTab.value.widgets);
   }
-})
+});
 
 const dataset = useDatasetStore();
-const datasetLoaded = computed(() => dataset.initialized)
+const datasetLoaded = computed(() => dataset.initialized);
 if (!dataset.initialized) {
   dataset.load();
 }

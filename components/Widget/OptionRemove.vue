@@ -1,15 +1,14 @@
 <template>
-
   <v-dialog
     v-model="isActive"
     width="500"
-    >
-    <template v-slot:activator="{ props }">
+  >
+    <template #activator="{ props }">
       <v-btn
         v-bind="props"
         size="small"
         icon="mdi-delete-outline"
-      ></v-btn>
+      />
     </template>
 
     <v-card title="위젯 삭제">
@@ -18,7 +17,7 @@
       </v-card-text>
 
       <v-card-actions>
-        <v-spacer></v-spacer>
+        <v-spacer />
 
         <v-btn
           variant="text"
@@ -29,19 +28,19 @@
         <v-btn
           text="Cancel"
           @click="onClickCancel"
-        ></v-btn>
+        />
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 <script setup lang="ts">
-const emits = defineEmits(['remove-widget'])
-const isActive = ref(false)
+const emits = defineEmits(['remove-widget']);
+const isActive = ref(false);
 const onClickRemove = () => {
-  isActive.value = false
-  emits('remove-widget')
-}
+  isActive.value = false;
+  emits('remove-widget');
+};
 const onClickCancel = () => {
-  isActive.value = false
-}
+  isActive.value = false;
+};
 </script>
