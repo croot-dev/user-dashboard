@@ -33,7 +33,6 @@ import WidgetOptionSetting from './OptionSetting.vue';
 import WidgetOptionRemove from './OptionRemove.vue';
 import { getWidgetComponent } from '~/utils';
 import type { WidgetType } from '~/types';
-const emits = defineEmits(['remove-widget']);
 const props = withDefaults(defineProps<{
   data: {
     title: string,
@@ -45,6 +44,7 @@ const props = withDefaults(defineProps<{
   loading: false,
   hideContent: false
 });
+const emits = defineEmits(['remove-widget']);
 const component = computed(() => getWidgetComponent(props.data.type));
 const cardRef = shallowRef<VCard>();
 const cardStyle = reactive({

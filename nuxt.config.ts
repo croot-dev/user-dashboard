@@ -1,5 +1,5 @@
-import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify'
-import eslintPlugin from 'vite-plugin-eslint'
+import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify';
+import eslintPlugin from 'vite-plugin-eslint';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -15,11 +15,14 @@ export default defineNuxtConfig({
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
         // @ts-expect-error
-        config.plugins.push(vuetify({ autoImport: true }))
-      })
+        config.plugins.push(vuetify({ autoImport: true }));
+      });
     }
     // ...
   ],
+  components: {
+    dirs: []
+  },
   vite: {
     vue: {
       template: {
@@ -40,4 +43,4 @@ export default defineNuxtConfig({
       /* other redis connector options */
     }
   }
-})
+});

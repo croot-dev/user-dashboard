@@ -1,23 +1,44 @@
 <template>
   <div class="tab-wrapper">
-    <div class="tab-list">
-      <div v-for="(tabData, i) in tabList" :key="i" class="tab-item">
-        <TabItem v-bind="{ ...tabData }" />
-      </div>
-    </div>
+    <v-tabs v-model="currentTabIndex">
+      <v-tab v-for="(tabData, i) in tabList" :key="i" class="tab-item">
+        <span v-if="'prepend' in tabData" class="prepend">{{ tabData.prepend }}</span>
+        <span class="title">{{ tabData.title }}</span>
+        <span v-if="'append' in tabData" class="append">{{ tabData.append }}</span>
+      </v-tab>
+    </v-tabs>
   </div>
   <div class="content-wrapper">
-    <slot name="content" />
+    <v-window v-model="currentTabIndex">
+      <v-window-item
+        v-for="(tabData, i) in tabList"
+        :key="i"
+        :value="i"
+      >
+        <DashboardContainer :tab-data="tabData" />
+      </v-window-item>
+    </v-window>
   </div>
 </template>
-<script setup lang="ts">
-import TabItem from './Item.vue';
-import type { ITab } from '~/types';
 
-defineProps<{
-  tabList: ITab[]
-}>();
+<script setup lang="ts">
+import { ref } from 'vue';
+import type { ITab } from '~/types';
+import DashboardContainer from '~/components/Dashboard/Container.vue';
+
+// handle list data
+const tabList = ref<ITab[]>([]);
+const currentTabIndex = ref<number|null>(null);
+const getDashboardList = async () => {
+  const data = await fetch('/api/dashboard').then(res => res.json());
+  tabList.value = data;
+  if (data.length > 0) {
+    currentTabIndex.value = 0;
+  }
+};
+getDashboardList();
 </script>
+
 <style lang="scss" scoped>
 .tab-wrapper {
   flex: 0 50px;

@@ -4,7 +4,7 @@
   </div>
 </template>
 <script setup lang="ts">
-// empty
+import TabContainer from '~/components/Tab/Container.vue';
 </script>
   <style lang="scss" scoped>
   :global(body) {

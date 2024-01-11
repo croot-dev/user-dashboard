@@ -1,5 +1,6 @@
-import { WidgetTypeA, WidgetTypeB, WidgetTypeC, WidgetTypeD } from '#components';
+import { WidgetTypeA, WidgetTypeB, WidgetTypeC, WidgetTypeD } from '~/components/Widget/Type';
 import type { WidgetType } from '~/types';
+
 export const getWidgetComponent = (typeCode : WidgetType) => {
   switch (typeCode) {
   case 'A' : return WidgetTypeA;

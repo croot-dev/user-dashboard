@@ -51,6 +51,12 @@
           >
             <v-icon icon="mdi-eraser" />
           </v-btn>
+          <v-btn
+            size="small"
+            @click="resetConditionValues"
+          >
+            <v-icon icon="mdi-eraser" />
+          </v-btn>
         </v-col>
       </v-row>
     </v-container>
@@ -58,6 +64,7 @@
 </template>
 <script setup lang="ts">
 import dayjs from 'dayjs';
+import type { LayoutItem, LayoutItemRequired } from 'vue3-grid-layout-next/dist/helpers/utils';
 const emits = defineEmits(['update:value']);
 const today = dayjs();
 const conditionValues = reactive({

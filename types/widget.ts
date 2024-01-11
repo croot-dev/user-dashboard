@@ -1,3 +1,5 @@
+export type WidgetKey = string;
+
 export interface WidgetContent {
     title: string;
 }
@@ -5,7 +7,7 @@ export interface WidgetContent {
 export type WidgetType = 'A' | 'B' | 'C' | 'D';
 
 export interface IWidget<T> {
-    uuid: string;
+    uuid: WidgetKey;
     type: WidgetType;
     sizeX: string;
     sizeY: string;
