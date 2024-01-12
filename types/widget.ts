@@ -1,31 +1,31 @@
-export type WidgetKey = string;
+export namespace Widget {
+    export type Key = string;
 
-export interface WidgetContent {
-    title: string;
-}
+    export interface Setting {
+        startDate: string;
+        endDate: string;
+    }
+    export interface Content {
+        title: string;
+    }
 
-export type WidgetType = 'A' | 'B' | 'C' | 'D';
+    export type Type = 'A' | 'B' | 'C' | 'D';
 
-export interface IWidget<T> {
-    uuid: WidgetKey;
-    type: WidgetType;
-    sizeX: string;
-    sizeY: string;
-    posX: string;
-    posY: string;
-    content: T & WidgetContent
-}
+    export interface Item<T = unknown> {
+        uuid: Key;
+        type: Type;
+        sizeX: string;
+        sizeY: string;
+        posX: string;
+        posY: string;
+        setting?: Setting;
+        content: T & Content;
+    }
 
-export interface ContentTypeA extends WidgetContent {
-    maintext: string;
-    caption: string;
-    imagesrc: string;
-}
+    export interface ContentTypeA extends Content {
+        maintext: string;
+        caption: string;
+        imagesrc: string;
+    }
 
-export interface ITab {
-    id: string;
-    title: string;
-    prepend?: string;
-    append?: string;
-    widgets: IWidget<unknown>[]
 }

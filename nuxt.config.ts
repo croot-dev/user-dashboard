@@ -36,11 +36,12 @@ export default defineNuxtConfig({
   },
   plugins: [{ src: '~/plugins/vue3-grid-layout-next', mode: 'client' }],
   runtimeConfig: {
+    public: {
+      baseURL: './'
+    },
     redis: {
-      // Default values
-      host: '',
-      port: 0
-      /* other redis connector options */
+      host: process.env.REDIS_HOST,
+      port: process.env.REDIS_PORT
     }
   }
 });

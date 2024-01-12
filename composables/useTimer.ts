@@ -8,9 +8,7 @@ export const useTimer = (
   const isRunning = shallowRef<boolean>(false);
 
   const start = () => {
-    console.log('start');
     const reloader = () => {
-      console.log('reloader');
       isRunning.value = true;
       timerId.value = setTimeout(async () => {
         const condition = typeof callback === 'function' ? await callback() : true;
@@ -24,7 +22,6 @@ export const useTimer = (
   };
 
   const stop = () => {
-    console.log('stop');
     clearTimeout(timerId.value);
     isRunning.value = false;
     return timerId.value;

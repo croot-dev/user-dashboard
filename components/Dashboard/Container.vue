@@ -1,7 +1,10 @@
 <template>
   <v-row>
     <v-col>
-      <DashboardContainerForm />
+      <DashboardContainerForm
+        :initial-data="tabData.globalSetting"
+        @update:value="onUpdateForm"
+      />
     </v-col>
   </v-row>
   <v-row>
@@ -58,35 +61,37 @@
       <WidgetContainer
         :data="item.data"
         :hide-content="isEditMode && isHideContent"
+        :is-edit="isEditMode"
         @remove-widget="handleRemoveWidget(item.i)"
       />
     </GridItem>
   </GridLayout>
 </template>
+
 <script setup lang="ts">
 import { GridLayout, GridItem } from 'vue3-grid-layout-next';
 import type { LayoutItem } from 'vue3-grid-layout-next/dist/helpers/utils.d.ts';
 import { computed, ref } from 'vue';
 import dayjs from 'dayjs';
-import type { ITab, IWidget, WidgetContent, WidgetKey } from '~/types';
+import type { Tab, Widget } from '~/types';
 import DashboardContainerForm from '~/components/Dashboard/ContainerForm.vue';
 import WidgetContainer from '~/components/Widget/Container.vue';
-import { useTimer } from '~/composable/useTimer';
+import { useTimer } from '~/composables/useTimer';
 import { useDatasetStore } from '~/stores/dataset';
 
 const props = defineProps<{
-  tabData: ITab;
+  tabData: Tab.Item;
 }>();
 const emits = defineEmits(['change-edit-mode', 'save-widgets']);
 
 // handle layout data
 interface ExpandLayoutItem extends LayoutItem {
-  data: IWidget<unknown> & WidgetContent;
+  data: Widget.Item & Widget.Content;
 }
 const dataset = useDatasetStore();
 const lastUpdateTime = ref('');
 const layout = ref<ExpandLayoutItem[]>([]);
-const getLayoutData = (tabWidgetData: IWidget<unknown>[]) => {
+const parseToLayout = (tabWidgetData: Widget.Item[]) => {
   const widgetList = Array.isArray(tabWidgetData) ? tabWidgetData : [];
   return widgetList.map((widget) => {
     const x = Number(widget.posX);
@@ -106,7 +111,7 @@ const getLayoutData = (tabWidgetData: IWidget<unknown>[]) => {
 };
 watch(() => dataset.initialized, (dataLoaded) => {
   if (dataLoaded) {
-    layout.value = getLayoutData(props.tabData.widgets || []) as ExpandLayoutItem[];
+    layout.value = parseToLayout(props.tabData.widgets || []) as ExpandLayoutItem[];
     lastUpdateTime.value = new Date().toISOString();
   }
 }, { immediate: true });
@@ -122,6 +127,11 @@ const onClickAutoReload = () => {
     updatedTimer.toggle();
   }
 };
+onBeforeUnmount(() => {
+  if (updatedTimer.isRunning.value) {
+    updatedTimer.stop();
+  }
+});
 
 // handle edit
 const isEditMode = ref(false);
@@ -133,11 +143,17 @@ const onChangeMode = () => {
   emits('change-edit-mode', isEditMode);
 };
 
+// handle form
+const onUpdateForm = async (data: Widget.Setting) => {
+
+  // await fetch('/api/dashboard', { method: 'PATCH', body: JSON.stringify(body) }).then(res => res.json());
+};
+
 // handle save
 const updateDashboardList = async (widgets :LayoutItem[]) => {
-  const body = { id: props.tabData.id, widgets };
-  const result = await fetch('/api/dashboard', { method: 'POST', body: JSON.stringify(body) }).then(res => res.json());
-  return result;
+  const body = { widgets };
+  const result = await useFetch(`/api/dashboard/${props.tabData.id}`, { method: 'PATCH', body: JSON.stringify(body) });
+  return result.data;
 };
 const save = (data: LayoutItem[]) => {
   return updateDashboardList(data);
@@ -151,10 +167,9 @@ const onClickSave = () => {
 };
 
 // handle remove widget
-const removeWidget = async (widgetId: WidgetKey) => {
-  const body = { id: props.tabData.id, widgetId };
-  // const result = await fetch('/api/dashboard', { method: 'DELETE', body: JSON.stringify(body) }).then(res => res.json());
-  // return result;
+const removeWidget = async (widgetId: Widget.Key) => {
+  const { data } = await useFetch(`/api/dashboard/${props.tabData.id}/${widgetId}`, { method: 'DELETE' });
+  console.log(data);
   return await true;
 };
 const handleRemoveWidget = (id: string) => {

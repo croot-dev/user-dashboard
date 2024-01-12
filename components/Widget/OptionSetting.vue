@@ -33,6 +33,7 @@
     </v-card>
   </v-dialog>
 </template>
+
 <script setup lang="ts">
 const emits = defineEmits(['edit-widget']);
 const isActive = ref(false);

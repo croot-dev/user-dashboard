@@ -1,2 +1,2 @@
-export * from './widget';
-export * from './dashboard';
+export type * from './tab';
+export type * from './widget';

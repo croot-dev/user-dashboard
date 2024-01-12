@@ -1,7 +1,7 @@
 <template>
   <v-form>
     <v-container>
-      <v-row>
+      <v-row align="center">
         <v-col
           cols="12"
           md="4"
@@ -11,8 +11,8 @@
             :rules="[]"
             :counter="10"
             label="Start Date"
+            suffix="🕗 00:00:00"
             required
-            single-line
             hide-details
           />
         </v-col>
@@ -27,7 +27,7 @@
             :counter="10"
             label="End Date"
             required
-            single-line
+            suffix="🕗 23:59:59"
             hide-details
           />
         </v-col>
@@ -39,20 +39,12 @@
           md="3"
         >
           <v-btn
-            size="small"
-            color="success"
-            @click="validate"
+            color="primary"
+            @click="submit"
           >
             <v-icon icon="mdi-magnify" />
           </v-btn>
           <v-btn
-            size="small"
-            @click="resetConditionValues"
-          >
-            <v-icon icon="mdi-eraser" />
-          </v-btn>
-          <v-btn
-            size="small"
             @click="resetConditionValues"
           >
             <v-icon icon="mdi-eraser" />
@@ -63,32 +55,50 @@
   </v-form>
 </template>
 <script setup lang="ts">
-import dayjs from 'dayjs';
-import type { LayoutItem, LayoutItemRequired } from 'vue3-grid-layout-next/dist/helpers/utils';
+import dayjs, { Dayjs } from 'dayjs';
+import type { Tab, Widget } from '~/types';
+
+const DATE_FORMAT = 'YYYY-MM-DD';
+const props = withDefaults(
+  defineProps<{
+    initialData: Tab.globalSetting
+  }>(),
+  {
+    initialData: {
+      startDate: dayjs().subtract(1, 'month').format(DATE_FORMAT),
+      endDate: dayjs().format(DATE_FORMAT)
+    }
+  }
+);
 const emits = defineEmits(['update:value']);
-const today = dayjs();
+
 const conditionValues = reactive({
-  startDate: '',
-  endDate: ''
+  startDate: props.initialData.startDate,
+  endDate: props.initialData.endDate
 });
 const resetConditionValues = () => {
-  conditionValues.startDate = today.subtract(1, 'month').format('YYYY-MM-DD');
-  conditionValues.endDate = today.format('YYYY-MM-DD');
-};
-const validate = () => {
-  const example = 0 + 1 === 1;
-  if (example) {
-    submit();
-  }
-  return false;
-};
-const submit = () => {
-  emits('update:value', conditionValues);
+  conditionValues.startDate = props.initialData.startDate;
+  conditionValues.endDate = props.initialData.endDate;
 };
 
-onMounted(() => {
-  resetConditionValues();
-});
+const validate = async ():Promise<boolean> => {
+  const example = await 0 + 1 === 1;
+  return example;
+};
+
+const submit = async () => {
+  const isValid = await validate();
+  if (isValid) {
+    const emitData: Widget.Setting = {
+      startDate: conditionValues.startDate,
+      endDate: conditionValues.endDate
+    };
+    emits('update:value', emitData);
+  } else {
+    // empty..
+  }
+};
+
 </script>
 <style lang="scss" scoped>
 </style>

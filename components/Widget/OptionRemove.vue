@@ -8,6 +8,7 @@
         v-bind="props"
         size="small"
         icon="mdi-delete-outline"
+        color="red"
       />
     </template>
 
@@ -33,6 +34,7 @@
     </v-card>
   </v-dialog>
 </template>
+
 <script setup lang="ts">
 const emits = defineEmits(['remove-widget']);
 const isActive = ref(false);
