@@ -60,6 +60,7 @@
     >
       <WidgetContainer
         :data="item.data"
+        :global-setting="tabData.globalSetting"
         :hide-content="isEditMode && isHideContent"
         :is-edit="isEditMode"
         @remove-widget="handleRemoveWidget(item.i)"
@@ -86,7 +87,7 @@ const emits = defineEmits(['change-edit-mode', 'save-widgets']);
 
 // handle layout data
 interface ExpandLayoutItem extends LayoutItem {
-  data: Widget.Item & Widget.Content;
+  data: Widget.Item;
 }
 const dataset = useDatasetStore();
 const lastUpdateTime = ref('');
@@ -105,8 +106,27 @@ const parseToLayout = (tabWidgetData: Widget.Item[]) => {
       w,
       h,
       static: false,
-      data: { type: widget.type, ...widget.content }
+      data: {
+        type: widget.type,
+        ...(widget.setting && { setting: widget.setting }),
+        ...(widget.content && { content: widget.content })
+      }
     } as LayoutItem;
+  });
+};
+const parseToReqBody = (tabWidgetData: ExpandLayoutItem[]): Widget.Item[] => {
+  const widgetList = Array.isArray(tabWidgetData) ? tabWidgetData : [];
+  return widgetList.map((widget) => {
+    return {
+      uuid: String(widget.i),
+      posX: String(widget.x),
+      posY: String(widget.y),
+      sizeX: String(widget.w),
+      sizeY: String(widget.h),
+      type: widget.data.type,
+      setting: toRaw(widget.data.setting),
+      content: toRaw(widget.data.content)
+    } as Widget.Item;
   });
 };
 watch(() => dataset.initialized, (dataLoaded) => {
@@ -150,13 +170,14 @@ const onUpdateForm = async (data: Widget.Setting) => {
 };
 
 // handle save
-const updateDashboardList = async (widgets :LayoutItem[]) => {
+const updateDashboardWidgets = async (widgets :Widget.Item[]) => {
   const body = { widgets };
   const result = await useFetch(`/api/dashboard/${props.tabData.id}`, { method: 'PATCH', body: JSON.stringify(body) });
   return result.data;
 };
-const save = (data: LayoutItem[]) => {
-  return updateDashboardList(data);
+const save = (data: ExpandLayoutItem[]) => {
+  const widgets = parseToReqBody(data);
+  return updateDashboardWidgets(widgets);
 };
 const onClickSave = () => {
   save(layout.value)

@@ -5,8 +5,8 @@
     :loading="loading"
   >
     <v-card-item
-      :title="props.data.title"
-      :subtitle="'2020.11.11 ~ 2023.11.23'"
+      :title="$props.data.content.title"
+      :subtitle="subtitle"
     >
       <v-skeleton-loader
         v-if="hideContent"
@@ -16,7 +16,7 @@
       <component
         :is="component"
         v-else
-        v-bind="{ ...props.data }"
+        v-bind="{ ...$props.data }"
         :width="cardStyle.width"
         :height="cardStyle.height"
       />
@@ -35,19 +35,23 @@ import type { VCard } from 'vuetify/lib/components/index.mjs';
 import WidgetOptionSetting from './OptionSetting.vue';
 import WidgetOptionRemove from './OptionRemove.vue';
 import { getWidgetComponent } from '~/utils';
-import type { Widget } from '~/types';
+import type { Tab, Widget } from '~/types';
 const props = withDefaults(defineProps<{
   data: {
-    title: string,
-    type: Widget.Type
+    title: string;
+    type: Widget.Type;
+    content: Widget.Content;
+    setting?: Widget.Setting;
   };
+  globalSetting: Tab.globalSetting;
   isEdit?: boolean;
   loading?: boolean;
   hideContent?: boolean;
 }>(), {
   isEdit: false,
   loading: false,
-  hideContent: false
+  hideContent: false,
+  content: { title: '' }
 });
 const emits = defineEmits(['remove-widget']);
 const component = computed(() => getWidgetComponent(props.data.type));
@@ -55,6 +59,14 @@ const cardRef = shallowRef<VCard>();
 const cardStyle = reactive({
   width: 0,
   height: 0
+});
+const useLocalSetting = computed(() => { return !!(props.data.setting && 'startDate' in props.data.setting && 'endDate' in props.data.setting); });
+const subtitle = computed(() => {
+  if (useLocalSetting.value) {
+    return `${props.data.setting?.startDate} ~ ${props.data.setting?.endDate}`;
+  } else {
+    return `${props.globalSetting.startDate} ~ ${props.globalSetting.endDate}`;
+  }
 });
 
 onMounted(() => {

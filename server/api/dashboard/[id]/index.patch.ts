@@ -20,9 +20,8 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody(event);
-  const origin = await storage.getItem<Tab.Item[]>('dashboard') || [];
-  const updated = Object.assign(origin[targetIndex], body);
-  origin.splice(targetIndex, 1, updated);
-  await storage.setItem('dashboard', origin);
+  const updated = Object.assign(data[targetIndex], body);
+  data.splice(targetIndex, 1, updated);
+  await storage.setItem('dashboard', data);
   return updated;
 });

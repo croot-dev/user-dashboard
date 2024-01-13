@@ -16,7 +16,7 @@
 <script setup lang="ts">
 const data = defineProps<{
   title: string;
-  height: string;
+  height: number;
   maintext?: string;
   caption?: string;
   imagesrc?: string;
