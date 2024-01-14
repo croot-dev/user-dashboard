@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const origin = await storage.getItem<Tab.Item[]>('dashboard') || [];
-  const widgets = origin[targetIndex].widgets.filter(widget => widget.uuid !== widgetId);
+  const widgets = origin[targetIndex].widgets.filter(widget => widget.id !== widgetId);
   const updated = { ...origin[targetIndex], widgets };
   origin.splice(targetIndex, 1, updated);
   await storage.setItem('dashboard', origin);

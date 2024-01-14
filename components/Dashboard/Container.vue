@@ -33,19 +33,25 @@
         hide-details
         label="hide content"
       />
-      <v-btn v-if="isEditMode" size="small" @click="onClickSave">
-        Save
-      </v-btn>
+      <template v-if="isEditMode">
+        <v-btn size="small" @click="onClickAdd">
+          Add
+        </v-btn>
+        <v-btn size="small" @click="onClickSave">
+          Save
+        </v-btn>
+      </template>
     </v-col>
   </v-row>
   <GridLayout
-    :layout="layout"
+    v-model:layout="layout"
     :col-num="4"
-    :max-rows="4"
+    :max-rows="isEditMode ? Infinity : 4"
     :row-height="240"
     :is-draggable="isEditMode"
     :is-resizable="isEditMode"
     :responsive="false"
+    :vertical-compact="true"
   >
     <GridItem
       v-for="(item, index) in layout"
@@ -56,6 +62,8 @@
       :w="item.w"
       :h="item.h"
       :i="item.i"
+      :max-w="2"
+      :max-h="2"
       class="grid-item"
     >
       <WidgetContainer
@@ -79,7 +87,9 @@ import DashboardContainerForm from '~/components/Dashboard/ContainerForm.vue';
 import WidgetContainer from '~/components/Widget/Container.vue';
 import { useTimer } from '~/composables/useTimer';
 import { useDatasetStore } from '~/stores/dataset';
+import { CODE } from '~/constants';
 
+const { show } = inject('toast');
 const props = defineProps<{
   tabData: Tab.Item;
 }>();
@@ -87,51 +97,45 @@ const emits = defineEmits(['change-edit-mode', 'save-widgets']);
 
 // handle layout data
 interface ExpandLayoutItem extends LayoutItem {
-  data: Widget.Item;
+  data: Widget.Item<any>;
 }
 const dataset = useDatasetStore();
 const lastUpdateTime = ref('');
 const layout = ref<ExpandLayoutItem[]>([]);
-const parseToLayout = (tabWidgetData: Widget.Item[]) => {
-  const widgetList = Array.isArray(tabWidgetData) ? tabWidgetData : [];
-  return widgetList.map((widget) => {
-    const x = Number(widget.posX);
-    const y = Number(widget.posY);
-    const w = Number(widget.sizeX);
-    const h = Number(widget.sizeY);
-    return {
-      i: widget.uuid,
-      x,
-      y,
-      w,
-      h,
-      static: false,
-      data: {
-        type: widget.type,
-        ...(widget.setting && { setting: widget.setting }),
-        ...(widget.content && { content: widget.content })
-      }
-    } as LayoutItem;
-  });
+const parseToLayoutItem = <T, >(widget: Widget.Item<T>): ExpandLayoutItem => {
+  const x = Number(widget.posX);
+  const y = Number(widget.posY);
+  const w = Number(widget.sizeX);
+  const h = Number(widget.sizeY);
+  return {
+    i: widget.id,
+    x,
+    y,
+    w,
+    h,
+    static: false,
+    data: {
+      type: widget.type,
+      ...(widget.setting && { setting: widget.setting }),
+      ...(widget.content && { content: widget.content })
+    }
+  } as ExpandLayoutItem;
 };
-const parseToReqBody = (tabWidgetData: ExpandLayoutItem[]): Widget.Item[] => {
-  const widgetList = Array.isArray(tabWidgetData) ? tabWidgetData : [];
-  return widgetList.map((widget) => {
-    return {
-      uuid: String(widget.i),
-      posX: String(widget.x),
-      posY: String(widget.y),
-      sizeX: String(widget.w),
-      sizeY: String(widget.h),
-      type: widget.data.type,
-      setting: toRaw(widget.data.setting),
-      content: toRaw(widget.data.content)
-    } as Widget.Item;
-  });
+const parseToWidgetItem = <T, >(widget: ExpandLayoutItem): Widget.Item<T> => {
+  return {
+    id: String(widget.i),
+    posX: String(widget.x),
+    posY: String(widget.y),
+    sizeX: String(widget.w),
+    sizeY: String(widget.h),
+    type: widget.data.type,
+    setting: toRaw(widget.data.setting),
+    content: toRaw(widget.data.content)
+  } as Widget.Item<T>;
 };
 watch(() => dataset.initialized, (dataLoaded) => {
   if (dataLoaded) {
-    layout.value = parseToLayout(props.tabData.widgets || []) as ExpandLayoutItem[];
+    layout.value = (props.tabData.widgets || []).map(widget => parseToLayoutItem(widget)) as ExpandLayoutItem[];
     lastUpdateTime.value = new Date().toISOString();
   }
 }, { immediate: true });
@@ -163,43 +167,43 @@ const onChangeMode = () => {
   emits('change-edit-mode', isEditMode);
 };
 
-// handle form
-const onUpdateForm = async (data: Widget.Setting) => {
-
-  // await fetch('/api/dashboard', { method: 'PATCH', body: JSON.stringify(body) }).then(res => res.json());
-};
-
-// handle save
-const updateDashboardWidgets = async (widgets :Widget.Item[]) => {
-  const body = { widgets };
+const updateDashboard = async (body: Partial<Tab.Item>) => {
   const result = await useFetch(`/api/dashboard/${props.tabData.id}`, { method: 'PATCH', body: JSON.stringify(body) });
+  show({ message: 'dashboard updated' });
   return result.data;
 };
-const save = (data: ExpandLayoutItem[]) => {
-  const widgets = parseToReqBody(data);
-  return updateDashboardWidgets(widgets);
-};
-const onClickSave = () => {
-  save(layout.value)
+
+// handle form
+const onUpdateForm = (globalSetting: Tab.globalSetting) => {
+  updateDashboard({ globalSetting })
     .then((result) => {
-      console.log(result);
       isEditMode.value = false;
     });
 };
 
-// handle remove widget
-const removeWidget = async (widgetId: Widget.Key) => {
-  const { data } = await useFetch(`/api/dashboard/${props.tabData.id}/${widgetId}`, { method: 'DELETE' });
-  console.log(data);
-  return await true;
-};
-const handleRemoveWidget = (id: string) => {
-  removeWidget(id)
+// handle save
+const onClickSave = () => {
+  const widgets = layout.value.map(widget => parseToWidgetItem(widget));
+  updateDashboard({ widgets })
     .then((result) => {
-      console.log(result);
-      const targetIndex = layout.value.findIndex(item => item.i === id);
-      layout.value.splice(targetIndex, 1);
+      isEditMode.value = false;
     });
+};
+const onClickAdd = () => {
+  const { getWidgetTemplate } = useTemplate(CODE.WIDGET);
+  const newWidgetItem = getWidgetTemplate({
+    posX: String(layout.value.length % 4),
+    posY: String(layout.value.length + 4),
+    sizeX: String(1),
+    sizeY: String(1),
+    content: { title: 'New Widget' }
+  });
+  layout.value.push(parseToLayoutItem(newWidgetItem));
+};
+
+const handleRemoveWidget = (id: string) => {
+  const targetIndex = layout.value.findIndex(item => item.i === id);
+  layout.value.splice(targetIndex, 1);
 };
 </script>
 

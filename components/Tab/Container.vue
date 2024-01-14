@@ -54,7 +54,7 @@ const onClickAddDashboard = async () => {
 
 <style lang="scss" scoped>
 .content-wrapper {
-  overflow: hidden;
+  overflow: auto;
   flex: 1 auto;
   margin: 0 8px 8px;
   background-color: #fefefe;

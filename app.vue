@@ -1,12 +1,15 @@
 <template>
   <div class="wrapper">
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
+    <ToastProvider>
+      <NuxtLayout>
+        <NuxtPage />
+      </NuxtLayout>
+    </ToastProvider>
   </div>
 </template>
 
 <script setup lang="ts">
+import ToastProvider from '~/providers/ToastProvider.vue';
 import { useDatasetStore } from '~/stores/dataset';
 
 const dataset = useDatasetStore();

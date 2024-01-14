@@ -1,4 +1,5 @@
 import { Tab } from '~/types';
+import { generateKey } from '~/utils';
 
 const DASHBOARD_TEMPLATE: Tab.Item = {
   id: '',
@@ -9,18 +10,6 @@ const DASHBOARD_TEMPLATE: Tab.Item = {
     autoReload: false
   },
   widgets: []
-};
-
-const generateKey = (length: number):string => {
-  const alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  let result = '';
-
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * alphabet.length);
-    result += alphabet.charAt(randomIndex);
-  }
-
-  return result;
 };
 
 export default defineEventHandler(async (event) => {

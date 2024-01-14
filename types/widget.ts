@@ -1,5 +1,5 @@
 export namespace Widget {
-    export type Key = string;
+    export type Id = string;
 
     export interface Setting {
         startDate: string;
@@ -12,7 +12,7 @@ export namespace Widget {
     export type Type = 'A' | 'B' | 'C' | 'D';
 
     export interface Item<T = unknown> {
-        uuid: Key;
+        id: Id;
         type: Type;
         sizeX: string;
         sizeY: string;
@@ -22,10 +22,10 @@ export namespace Widget {
         content: T & Content;
     }
 
-    export interface ContentTypeA extends Content {
+    export interface ContentA extends Content {
         maintext: string;
-        caption: string;
-        imagesrc: string;
+        caption?: string;
+        imagesrc?: string;
     }
 
 }

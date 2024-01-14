@@ -34,8 +34,12 @@
 import type { VCard } from 'vuetify/lib/components/index.mjs';
 import WidgetOptionSetting from './OptionSetting.vue';
 import WidgetOptionRemove from './OptionRemove.vue';
-import { getWidgetComponent } from '~/utils';
 import type { Tab, Widget } from '~/types';
+
+const getWidgetComponent = (typeCode : Widget.Type) => {
+  return defineAsyncComponent(() => import(`~/components/Widget/Type/${typeCode}.vue`));
+};
+
 const props = withDefaults(defineProps<{
   data: {
     title: string;
