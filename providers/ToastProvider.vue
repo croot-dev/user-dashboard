@@ -1,16 +1,26 @@
-<script setup>
+<script setup lang="ts">
 import { provide, ref } from 'vue';
+import { PROVIDE_KEY } from '~/constants';
+
+export interface ToastProvider {
+  show: (options: {
+    message: string;
+    color?: string;
+  }) => void;
+  hide: () => void;
+}
 
 const show = ref(false);
 const message = ref('');
 const color = ref('');
 
-provide('toast', {
+provide<ToastProvider>(PROVIDE_KEY.TOAST, {
   show (options) {
     message.value = options.message;
-    color.value = options.color;
+    if (options?.color) {
+      color.value = options?.color;
+    }
     show.value = true;
-    console.log('toast');
   },
   hide () {
     show.value = false;

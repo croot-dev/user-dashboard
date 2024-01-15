@@ -27,13 +27,13 @@ const template: Record<Values<typeof CODE>, Tab.Item | Widget.Item> = {
 };
 
 export const useTemplate = (type: Values<typeof CODE>) => {
-  const getTabTemplate = <T = unknown>(customObject: Partial<Tab.Item>) => {
+  const getTabTemplate = (customObject: Partial<Tab.Item>) => {
     const newObject = deepMerge.all([
       {},
       template[type],
       customObject,
       { id: generateKey(5) }
-    ]) as Tab.Item<T>;
+    ]) as Tab.Item;
 
     return newObject;
   };

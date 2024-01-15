@@ -87,55 +87,25 @@ import DashboardContainerForm from '~/components/Dashboard/ContainerForm.vue';
 import WidgetContainer from '~/components/Widget/Container.vue';
 import { useTimer } from '~/composables/useTimer';
 import { useDatasetStore } from '~/stores/dataset';
-import { CODE } from '~/constants';
+import { CODE, PROVIDE_KEY } from '~/constants';
+import type { ToastProvider } from '~/providers/ToastProvider.vue';
+import { useWidgetParser, type ExpandLayoutItem } from '#imports';
 
-const { show } = inject('toast');
 const props = defineProps<{
   tabData: Tab.Item;
 }>();
 const emits = defineEmits(['change-edit-mode', 'save-widgets']);
+const toast = inject<ToastProvider>(PROVIDE_KEY.TOAST) || { show: () => {} };
 
 // handle layout data
-interface ExpandLayoutItem extends LayoutItem {
-  data: Widget.Item<any>;
-}
 const dataset = useDatasetStore();
 const lastUpdateTime = ref('');
 const layout = ref<ExpandLayoutItem[]>([]);
-const parseToLayoutItem = <T, >(widget: Widget.Item<T>): ExpandLayoutItem => {
-  const x = Number(widget.posX);
-  const y = Number(widget.posY);
-  const w = Number(widget.sizeX);
-  const h = Number(widget.sizeY);
-  return {
-    i: widget.id,
-    x,
-    y,
-    w,
-    h,
-    static: false,
-    data: {
-      type: widget.type,
-      ...(widget.setting && { setting: widget.setting }),
-      ...(widget.content && { content: widget.content })
-    }
-  } as ExpandLayoutItem;
-};
-const parseToWidgetItem = <T, >(widget: ExpandLayoutItem): Widget.Item<T> => {
-  return {
-    id: String(widget.i),
-    posX: String(widget.x),
-    posY: String(widget.y),
-    sizeX: String(widget.w),
-    sizeY: String(widget.h),
-    type: widget.data.type,
-    setting: toRaw(widget.data.setting),
-    content: toRaw(widget.data.content)
-  } as Widget.Item<T>;
-};
+const { convertToLayoutItem, convertToWidgetItem } = useWidgetParser();
+
 watch(() => dataset.initialized, (dataLoaded) => {
   if (dataLoaded) {
-    layout.value = (props.tabData.widgets || []).map(widget => parseToLayoutItem(widget)) as ExpandLayoutItem[];
+    layout.value = (props.tabData.widgets || []).map(widget => convertToLayoutItem(widget)) as ExpandLayoutItem[];
     lastUpdateTime.value = new Date().toISOString();
   }
 }, { immediate: true });
@@ -169,7 +139,7 @@ const onChangeMode = () => {
 
 const updateDashboard = async (body: Partial<Tab.Item>) => {
   const result = await useFetch(`/api/dashboard/${props.tabData.id}`, { method: 'PATCH', body: JSON.stringify(body) });
-  show({ message: 'dashboard updated' });
+  toast.show({ message: 'dashboard updated' });
   return result.data;
 };
 
@@ -183,7 +153,7 @@ const onUpdateForm = (globalSetting: Tab.globalSetting) => {
 
 // handle save
 const onClickSave = () => {
-  const widgets = layout.value.map(widget => parseToWidgetItem(widget));
+  const widgets = layout.value.map(widget => convertToWidgetItem(widget));
   updateDashboard({ widgets })
     .then((result) => {
       isEditMode.value = false;
@@ -198,7 +168,7 @@ const onClickAdd = () => {
     sizeY: String(1),
     content: { title: 'New Widget' }
   });
-  layout.value.push(parseToLayoutItem(newWidgetItem));
+  layout.value.push(convertToLayoutItem(newWidgetItem));
 };
 
 const handleRemoveWidget = (id: string) => {

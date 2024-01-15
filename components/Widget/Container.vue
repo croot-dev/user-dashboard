@@ -41,12 +41,7 @@ const getWidgetComponent = (typeCode : Widget.Type) => {
 };
 
 const props = withDefaults(defineProps<{
-  data: {
-    title: string;
-    type: Widget.Type;
-    content: Widget.Content;
-    setting?: Widget.Setting;
-  };
+  data: Widget.Item<any>;
   globalSetting: Tab.globalSetting;
   isEdit?: boolean;
   loading?: boolean;
