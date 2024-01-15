@@ -67,6 +67,7 @@
       class="grid-item"
     >
       <WidgetContainer
+        :tab-id="tabData.id"
         :data="item.data"
         :global-setting="tabData.globalSetting"
         :hide-content="isEditMode && isHideContent"
@@ -91,10 +92,10 @@ import { useDatasetStore } from '~/stores/dataset';
 import { PROVIDE_KEY } from '~/constants';
 import type { ToastProvider } from '~/providers/ToastProvider.vue';
 
-const props = defineProps<{
+interface Props {
   tabData: Tab.Item;
-}>();
-const emits = defineEmits(['change-edit-mode', 'save-widgets']);
+}
+const props = defineProps<Props>();
 const toast = inject<ToastProvider>(PROVIDE_KEY.TOAST) || { show: () => {} };
 
 // handle layout data
@@ -119,7 +120,6 @@ const onUpdateMode = (value: boolean | null) => {
   } else {
     reset();
   }
-  emits('change-edit-mode', value);
 };
 
 // handle auto reload
@@ -142,7 +142,7 @@ const updateDashboard = async (body: Partial<Tab.Item>) => {
 };
 
 // handle form
-const onUpdateForm = (globalSetting: Tab.globalSetting) => {
+const onUpdateForm = (globalSetting: Tab.GlobalSetting) => {
   updateDashboard({ globalSetting })
     .then((result) => {
       isEditMode.value = false;

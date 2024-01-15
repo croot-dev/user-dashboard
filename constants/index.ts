@@ -4,7 +4,8 @@ export const CODE = {
 } as const;
 
 export const PROVIDE_KEY = {
-  TOAST: Symbol('toast') as InjectionKey<string>
+  TOAST: Symbol('toast') as InjectionKey<string>,
+  DASHBOARD: Symbol('toast') as InjectionKey<string>
 } as const;
 
 export const WIDGET_TYPE = {

@@ -25,8 +25,16 @@
 
     <div class="widget-option">
       <v-btn-group>
-        <WidgetOptionSetting />
-        <WidgetOptionRemove v-if="isEdit" @remove-widget="emits('remove-widget')" />
+        <WidgetOptionSetting
+          v-bind="{
+            title: $props.data.content.title,
+            type: $props.data.type,
+            useLocalSetting,
+            ...(useLocalSetting && { ...props.data.setting })
+          }"
+          @update:setting="handleUpdateSetting"
+        />
+        <WidgetOptionRemove v-if="isEdit" @remove-widget="emits('remove-widget', data.id)" />
       </v-btn-group>
     </div>
   </v-card>
@@ -34,9 +42,26 @@
 <script setup lang="ts">
 import type { VCard } from 'vuetify/lib/components/index.mjs';
 import type { AsyncComponentLoader } from 'vue';
-import WidgetOptionSetting from './OptionSetting.vue';
+import WidgetOptionSetting, { type WidgetOptionSettingForm } from './OptionSetting.vue';
 import WidgetOptionRemove from './OptionRemove.vue';
 import type { Tab, Widget } from '~/types';
+
+interface Props {
+  tabId: Tab.Id;
+  data: Widget.Item<any>;
+  globalSetting: Tab.GlobalSetting;
+  isEdit?: boolean;
+  loading?: boolean;
+  hideContent?: boolean;
+}
+const props = withDefaults(defineProps<Props>(), {
+  isEdit: false,
+  loading: false,
+  hideContent: false
+});
+const emits = defineEmits<{
+  'remove-widget': [Widget.Id]
+}>();
 
 const getWidgetComponent = (typeCode: Widget.Type): AsyncComponentLoader => {
   return defineAsyncComponent(() => import(`~/components/Widget/Type/${typeCode}.vue`)
@@ -45,19 +70,6 @@ const getWidgetComponent = (typeCode: Widget.Type): AsyncComponentLoader => {
       return import('~/components/Widget/Type/Empty.vue');
     }));
 };
-
-const props = withDefaults(defineProps<{
-  data: Widget.Item<any>;
-  globalSetting: Tab.globalSetting;
-  isEdit?: boolean;
-  loading?: boolean;
-  hideContent?: boolean;
-}>(), {
-  isEdit: false,
-  loading: false,
-  hideContent: false
-});
-const emits = defineEmits(['remove-widget']);
 const component = computed(() => getWidgetComponent(props.data.type));
 const cardRef = shallowRef<VCard>();
 const cardStyle = reactive({
@@ -65,13 +77,11 @@ const cardStyle = reactive({
   height: 0
 });
 const useLocalSetting = computed(() => { return !!(props.data.setting && 'startDate' in props.data.setting && 'endDate' in props.data.setting); });
-const subtitle = computed(() => {
-  if (useLocalSetting.value) {
-    return `${props.data.setting?.startDate} ~ ${props.data.setting?.endDate}`;
-  } else {
-    return `${props.globalSetting.startDate} ~ ${props.globalSetting.endDate}`;
-  }
-});
+const subtitle = computed(() => (
+  (useLocalSetting.value)
+    ? `${props.data.setting?.startDate} ~ ${props.data.setting?.endDate}`
+    : `${props.globalSetting.startDate} ~ ${props.globalSetting.endDate}`
+));
 
 onMounted(() => {
   // Grid 적용으로 인한 강제 제어 순서 변경
@@ -82,6 +92,20 @@ onMounted(() => {
     }
   });
 });
+
+const handleUpdateSetting = (settingData: WidgetOptionSettingForm) => {
+  const body: Partial<Widget.Item> = {
+    type: settingData.type || props.data.type,
+    content: { title: settingData.title || props.data.content.title },
+    ...(settingData.useLocalSetting && {
+      setting: {
+        startDate: settingData.startDate || '',
+        endDate: settingData.endDate || ''
+      }
+    })
+  };
+  useFetch(`/api/dashboard/${props.tabId}/widget/${props.data.id}`, { method: 'PATCH', body: JSON.stringify(body) });
+};
 </script>
 
 <style lang="scss" scoped>

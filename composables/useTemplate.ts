@@ -1,10 +1,15 @@
 import { deepMerge } from '~/utils';
-import { CODE } from '~/constants';
+import { CODE, WIDGET_TYPE } from '~/constants';
 import type { Tab, Widget } from '~/types';
 
 type Values<T extends Record<string, any>> = T[keyof T];
 
-const template: Record<Values<typeof CODE>, Tab.Item | Widget.Item> = {
+interface Template {
+  [CODE.TAB]: Tab.Item;
+  [CODE.WIDGET]: Widget.Item;
+}
+
+const template: Template = {
   [CODE.TAB]: {
     id: '',
     title: '',
@@ -17,7 +22,7 @@ const template: Record<Values<typeof CODE>, Tab.Item | Widget.Item> = {
   },
   [CODE.WIDGET]: {
     id: '',
-    type: 'A',
+    type: WIDGET_TYPE.INDICATOR,
     sizeX: '',
     sizeY: '',
     posX: '',
@@ -27,22 +32,22 @@ const template: Record<Values<typeof CODE>, Tab.Item | Widget.Item> = {
 };
 
 export const useTemplate = (type: Values<typeof CODE>) => {
-  const getTabTemplate = (customObject: Partial<Tab.Item>) => {
+  const getTabTemplate = (customTabObject: Partial<Tab.Item>) => {
     const newObject = deepMerge.all([
       {},
       template[type],
-      customObject,
+      customTabObject,
       { id: generateKey(5) }
     ]) as Tab.Item;
 
     return newObject;
   };
 
-  const getWidgetTemplate = <T = Widget.ContentA>(customObject: Partial<Widget.Item>) => {
+  const getWidgetTemplate = <T = Widget.ContentA>(customWidgetObject: Partial<Widget.Item>) => {
     const newObject = deepMerge.all([
       {},
       template[type],
-      customObject,
+      customWidgetObject,
       { id: generateKey(5) }
     ]) as Widget.Item<T>;
 

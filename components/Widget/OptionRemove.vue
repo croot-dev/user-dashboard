@@ -37,6 +37,7 @@
 
 <script setup lang="ts">
 const emits = defineEmits(['remove-widget']);
+
 const isActive = ref(false);
 const onClickRemove = () => {
   isActive.value = false;

@@ -1,5 +1,5 @@
 <template>
-  <v-form>
+  <v-form @submit.prevent>
     <v-container>
       <v-row align="center">
         <v-col
@@ -54,25 +54,31 @@
     </v-container>
   </v-form>
 </template>
+
 <script setup lang="ts">
 import dayjs, { Dayjs } from 'dayjs';
 import type { Tab, Widget } from '~/types';
 
+interface FormData {
+  startDate: Tab.GlobalSetting['startDate'];
+  endDate: Tab.GlobalSetting['endDate'];
+}
+interface Props {
+  initialData: FormData
+}
 const DATE_FORMAT = 'YYYY-MM-DD';
 const props = withDefaults(
-  defineProps<{
-    initialData: Tab.globalSetting
-  }>(),
+  defineProps<Props>(),
   {
-    initialData: {
+    initialData: () => ({
       startDate: dayjs().subtract(1, 'month').format(DATE_FORMAT),
       endDate: dayjs().format(DATE_FORMAT)
-    }
+    })
   }
 );
 const emits = defineEmits(['update:value']);
 
-const conditionValues = reactive({
+const conditionValues = reactive<FormData>({
   startDate: props.initialData.startDate,
   endDate: props.initialData.endDate
 });
@@ -98,7 +104,4 @@ const submit = async () => {
     // empty..
   }
 };
-
 </script>
-<style lang="scss" scoped>
-</style>

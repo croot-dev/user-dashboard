@@ -2,7 +2,7 @@ import type { Widget } from './';
 
 export namespace Tab {
     export type Id = string;
-    export interface globalSetting {
+    export interface GlobalSetting {
         startDate: string;
         endDate: string;
         autoReload: boolean;
@@ -11,7 +11,7 @@ export namespace Tab {
     export interface Item {
         id: string;
         title: string;
-        globalSetting: globalSetting
+        globalSetting: GlobalSetting
         widgets: Widget.Item[]
     }
 }

@@ -21,6 +21,7 @@
 </template>
 <script setup lang="ts">
 const emits = defineEmits(['add-widget']);
+
 const dialog = ref(false);
 const handleClickClose = () => {
   dialog.value = false;

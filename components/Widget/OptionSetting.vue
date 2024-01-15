@@ -3,17 +3,71 @@
     v-model="isActive"
     width="500"
   >
-    <template #activator="{ props }">
+    <template #activator="{ props: buttonProps }">
       <v-btn
-        v-bind="props"
+        v-bind="buttonProps"
         size="small"
         icon="mdi-pencil-outline"
       />
     </template>
 
-    <v-card title="Dialog">
+    <v-card title="Setting">
       <v-card-text>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        <v-form @submit.prevent>
+          <v-container>
+            <v-row no-gutters>
+              <v-text-field
+                v-model="form.title"
+                :rules="[]"
+                label="위젯명"
+                density="compact"
+                required
+                hide-details
+                clearable
+              />
+            </v-row>
+            <v-row no-gutters>
+              <v-select
+                v-model="form.type"
+                :items="widgetTypeOptions"
+                label="Type"
+                required
+                hide-details
+                density="compact"
+              />
+            </v-row>
+            <v-row no-gutters>
+              <v-switch
+                v-model="form.useLocalSetting"
+                label="기간 개별 설정"
+                density="compact"
+                hide-details
+              />
+            </v-row>
+            <v-row v-if="form.useLocalSetting" no-gutters>
+              <v-col>
+                <v-text-field
+                  v-model="form.startDate"
+                  :rules="[]"
+                  label="조회시작일자"
+                  density="compact"
+                  required
+                  hide-details
+                />
+              </v-col>
+              <v-col>
+                <v-text-field
+                  v-model="form.endDate"
+                  :rules="[]"
+                  label="조회시작일자"
+                  density="compact"
+                  required
+                  hide-details
+                />
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-form>
       </v-card-text>
 
       <v-card-actions>
@@ -35,11 +89,40 @@
 </template>
 
 <script setup lang="ts">
-const emits = defineEmits(['edit-widget']);
+import { WIDGET_TYPE } from '~/constants';
+import type { Widget } from '~/types';
+
+interface Props {
+  title?: string;
+  type?: Widget.Type;
+  useLocalSetting: boolean;
+  startDate?: Widget.Setting['startDate'] | null;
+  endDate?: Widget.Setting['endDate'] | null;
+}
+export interface WidgetOptionSettingForm extends Props {}
+const props = withDefaults(defineProps<Props>(), {
+  title: '',
+  type: WIDGET_TYPE.INDICATOR,
+  startDate: null,
+  endDate: null
+});
+const emits = defineEmits<{
+  'update:setting': [WidgetOptionSettingForm]
+}>();
+
 const isActive = ref(false);
+const form = reactive<Props>({
+  title: props.title,
+  type: props.type,
+  useLocalSetting: props.useLocalSetting,
+  startDate: props.useLocalSetting ? props.startDate : null,
+  endDate: props.useLocalSetting ? props.endDate : null
+});
+const widgetTypeOptions = ref(Object.entries(WIDGET_TYPE).map(([title, value]) => ({ title, value })));
+
 const onClickEdit = () => {
+  emits('update:setting', form);
   isActive.value = false;
-  emits('edit-widget');
 };
 const onClickCancel = () => {
   isActive.value = false;

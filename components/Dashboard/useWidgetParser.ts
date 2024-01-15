@@ -19,6 +19,7 @@ export const useWidgetParser = () => {
       h,
       static: false,
       data: {
+        id: widget.id,
         type: widget.type,
         ...(widget.setting && { setting: widget.setting }),
         ...(widget.content && { content: widget.content })
