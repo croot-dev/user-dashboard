@@ -1,3 +1,4 @@
+import { WIDGET_TYPE } from '~/constants';
 export namespace Widget {
     export type Id = string;
 
@@ -9,7 +10,7 @@ export namespace Widget {
         title: string;
     }
 
-    export type Type = 'A' | 'B' | 'C' | 'D';
+    export type Type = typeof WIDGET_TYPE[keyof typeof WIDGET_TYPE]
 
     export interface Item<T = unknown> {
         id: Id;

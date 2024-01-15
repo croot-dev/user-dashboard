@@ -16,9 +16,10 @@
       <component
         :is="component"
         v-else
-        v-bind="{ ...$props.data }"
+        :title="$props.data.content.title"
         :width="cardStyle.width"
         :height="cardStyle.height"
+        v-bind="{ ...$props.data }"
       />
     </v-card-item>
 
@@ -32,12 +33,17 @@
 </template>
 <script setup lang="ts">
 import type { VCard } from 'vuetify/lib/components/index.mjs';
+import type { AsyncComponentLoader } from 'vue';
 import WidgetOptionSetting from './OptionSetting.vue';
 import WidgetOptionRemove from './OptionRemove.vue';
 import type { Tab, Widget } from '~/types';
 
-const getWidgetComponent = (typeCode : Widget.Type) => {
-  return defineAsyncComponent(() => import(`~/components/Widget/Type/${typeCode}.vue`));
+const getWidgetComponent = (typeCode: Widget.Type): AsyncComponentLoader => {
+  return defineAsyncComponent(() => import(`~/components/Widget/Type/${typeCode}.vue`)
+    .catch((error) => {
+      console.log(error.message);
+      return import('~/components/Widget/Type/Empty.vue');
+    }));
 };
 
 const props = withDefaults(defineProps<{
@@ -49,8 +55,7 @@ const props = withDefaults(defineProps<{
 }>(), {
   isEdit: false,
   loading: false,
-  hideContent: false,
-  content: { title: '' }
+  hideContent: false
 });
 const emits = defineEmits(['remove-widget']);
 const component = computed(() => getWidgetComponent(props.data.type));

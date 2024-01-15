@@ -11,11 +11,15 @@
 <script setup lang="ts">
 const { wealthByAgeGroup } = useDatasetStore();
 
-defineProps<{
+withDefaults(defineProps<{
   title: string;
   width: number;
   height: number;
-}>();
+}>(), {
+  title: 'Undefined',
+  width: 240,
+  height: 240
+});
 
 const data = ref<any>([]);
 watch(() => wealthByAgeGroup, () => {
