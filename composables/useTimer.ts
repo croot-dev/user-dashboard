@@ -31,6 +31,12 @@ export const useTimer = (
     return (isRunning.value) ? stop() : start();
   };
 
+  onBeforeUnmount(() => {
+    if (isRunning.value === true) {
+      stop();
+    }
+  });
+
   return {
     timerId: toRaw(timerId),
     isRunning: toRaw(isRunning),

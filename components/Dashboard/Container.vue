@@ -25,7 +25,7 @@
         v-model="isEditMode"
         :label="isEditMode? 'edit' : 'read'"
         hide-details
-        @change="onChangeMode"
+        @update:model-value="onUpdateMode"
       />
       <v-checkbox
         v-if="isEditMode"
@@ -79,17 +79,17 @@
 
 <script setup lang="ts">
 import { GridLayout, GridItem } from 'vue3-grid-layout-next';
-import type { LayoutItem } from 'vue3-grid-layout-next/dist/helpers/utils.d.ts';
 import { computed, ref } from 'vue';
 import dayjs from 'dayjs';
+import { useGridLayout } from './useGridLayout';
+import { useWidgetParser } from './useWidgetParser';
 import type { Tab, Widget } from '~/types';
 import DashboardContainerForm from '~/components/Dashboard/ContainerForm.vue';
 import WidgetContainer from '~/components/Widget/Container.vue';
 import { useTimer } from '~/composables/useTimer';
 import { useDatasetStore } from '~/stores/dataset';
-import { CODE, PROVIDE_KEY } from '~/constants';
+import { PROVIDE_KEY } from '~/constants';
 import type { ToastProvider } from '~/providers/ToastProvider.vue';
-import { useWidgetParser, type ExpandLayoutItem } from '#imports';
 
 const props = defineProps<{
   tabData: Tab.Item;
@@ -98,17 +98,29 @@ const emits = defineEmits(['change-edit-mode', 'save-widgets']);
 const toast = inject<ToastProvider>(PROVIDE_KEY.TOAST) || { show: () => {} };
 
 // handle layout data
-const dataset = useDatasetStore();
 const lastUpdateTime = ref('');
-const layout = ref<ExpandLayoutItem[]>([]);
+const dataset = useDatasetStore();
+const { layout, addItem: addLayoutItem, removeItem: removeLayoutItem } = useGridLayout();
 const { convertToLayoutItem, convertToWidgetItem } = useWidgetParser();
+const reset = () => {
+  layout.value = (props.tabData.widgets || []).map(widget => convertToLayoutItem(widget));
+  lastUpdateTime.value = new Date().toISOString();
+};
+watch(() => dataset.initialized, (loaded) => { (loaded) && reset(); }, { immediate: true });
 
-watch(() => dataset.initialized, (dataLoaded) => {
-  if (dataLoaded) {
-    layout.value = (props.tabData.widgets || []).map(widget => convertToLayoutItem(widget)) as ExpandLayoutItem[];
-    lastUpdateTime.value = new Date().toISOString();
+// handle mode
+const isEditMode = ref(false);
+const isHideContent = ref(true);
+const onUpdateMode = (value: boolean | null) => {
+  if (value) {
+    if (updatedTimer.isRunning.value) {
+      updatedTimer.stop();
+    }
+  } else {
+    reset();
   }
-}, { immediate: true });
+  emits('change-edit-mode', value);
+};
 
 // handle auto reload
 const updatedTimer = useTimer(() => {
@@ -121,22 +133,8 @@ const onClickAutoReload = () => {
     updatedTimer.toggle();
   }
 };
-onBeforeUnmount(() => {
-  if (updatedTimer.isRunning.value) {
-    updatedTimer.stop();
-  }
-});
 
-// handle edit
-const isEditMode = ref(false);
-const isHideContent = ref(true);
-const onChangeMode = () => {
-  if (updatedTimer.isRunning.value) {
-    updatedTimer.stop();
-  }
-  emits('change-edit-mode', isEditMode);
-};
-
+// handle api
 const updateDashboard = async (body: Partial<Tab.Item>) => {
   const result = await useFetch(`/api/dashboard/${props.tabData.id}`, { method: 'PATCH', body: JSON.stringify(body) });
   toast.show({ message: 'dashboard updated' });
@@ -151,7 +149,6 @@ const onUpdateForm = (globalSetting: Tab.globalSetting) => {
     });
 };
 
-// handle save
 const onClickSave = () => {
   const widgets = layout.value.map(widget => convertToWidgetItem(widget));
   updateDashboard({ widgets })
@@ -159,21 +156,13 @@ const onClickSave = () => {
       isEditMode.value = false;
     });
 };
+
 const onClickAdd = () => {
-  const { getWidgetTemplate } = useTemplate(CODE.WIDGET);
-  const newWidgetItem = getWidgetTemplate({
-    posX: String(layout.value.length % 4),
-    posY: String(layout.value.length + 4),
-    sizeX: String(1),
-    sizeY: String(1),
-    content: { title: 'New Widget' }
-  });
-  layout.value.push(convertToLayoutItem(newWidgetItem));
+  addLayoutItem();
 };
 
-const handleRemoveWidget = (id: string) => {
-  const targetIndex = layout.value.findIndex(item => item.i === id);
-  layout.value.splice(targetIndex, 1);
+const handleRemoveWidget = (id: Widget.Id) => {
+  removeLayoutItem(id);
 };
 </script>
 
