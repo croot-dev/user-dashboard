@@ -82,29 +82,35 @@
 import { GridLayout, GridItem } from 'vue3-grid-layout-next';
 import { computed, ref } from 'vue';
 import dayjs from 'dayjs';
-import { useGridLayout } from './useGridLayout';
-import { useWidgetParser } from './useWidgetParser';
+import { useWidgetParser } from '~/composables/useWidgetParser';
 import type { Tab, Widget } from '~/types';
 import DashboardContainerForm from '~/components/Dashboard/ContainerForm.vue';
 import WidgetContainer from '~/components/Widget/Container.vue';
 import { useTimer } from '~/composables/useTimer';
 import { useDatasetStore } from '~/stores/dataset';
 import { PROVIDE_KEY } from '~/constants';
-import type { ToastProvider } from '~/providers/ToastProvider.vue';
+import type { ToastProviderProps } from '~/providers/ToastProvider.vue';
+import type { DashboardProvider } from '~/providers/DashboardProvider.vue';
 
 interface Props {
   tabData: Tab.Item;
 }
 const props = defineProps<Props>();
-const toast = inject<ToastProvider>(PROVIDE_KEY.TOAST) || { show: () => {} };
+const toast = inject<ToastProviderProps>(PROVIDE_KEY.TOAST) as ToastProviderProps;
 
 // handle layout data
 const lastUpdateTime = ref('');
 const dataset = useDatasetStore();
-const { layout, addItem: addLayoutItem, removeItem: removeLayoutItem } = useGridLayout();
-const { convertToLayoutItem, convertToWidgetItem } = useWidgetParser();
+const {
+  layout,
+  updateLayout,
+  addItem: addLayoutItem,
+  removeItem: removeLayoutItem
+} = inject<DashboardProvider>(PROVIDE_KEY.DASHBOARD) as DashboardProvider;
+const {
+  convertToWidgetItem
+} = useWidgetParser();
 const reset = () => {
-  layout.value = (props.tabData.widgets || []).map(widget => convertToLayoutItem(widget));
   lastUpdateTime.value = new Date().toISOString();
 };
 watch(() => dataset.initialized, (loaded) => { (loaded) && reset(); }, { immediate: true });
@@ -134,25 +140,20 @@ const onClickAutoReload = () => {
   }
 };
 
-// handle api
-const updateDashboard = async (body: Partial<Tab.Item>) => {
-  const result = await useFetch(`/api/dashboard/${props.tabData.id}`, { method: 'PATCH', body: JSON.stringify(body) });
-  toast.show({ message: 'dashboard updated' });
-  return result.data;
-};
-
 // handle form
 const onUpdateForm = (globalSetting: Tab.GlobalSetting) => {
-  updateDashboard({ globalSetting })
-    .then((result) => {
+  updateLayout(props.tabData.id, { globalSetting })
+    .then(() => {
+      toast.show({ message: 'dashboard updated' });
       isEditMode.value = false;
     });
 };
 
 const onClickSave = () => {
   const widgets = layout.value.map(widget => convertToWidgetItem(widget));
-  updateDashboard({ widgets })
-    .then((result) => {
+  updateLayout(props.tabData.id, { widgets })
+    .then(() => {
+      toast.show({ message: 'dashboard updated' });
       isEditMode.value = false;
     });
 };

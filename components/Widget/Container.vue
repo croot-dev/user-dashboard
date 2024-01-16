@@ -45,6 +45,9 @@ import type { AsyncComponentLoader } from 'vue';
 import WidgetOptionSetting, { type WidgetOptionSettingForm } from './OptionSetting.vue';
 import WidgetOptionRemove from './OptionRemove.vue';
 import type { Tab, Widget } from '~/types';
+import { PROVIDE_KEY } from '~/constants';
+import type { ToastProviderProps } from '~/providers/ToastProvider.vue';
+import type { DashboardProvider } from '~/providers/DashboardProvider.vue';
 
 interface Props {
   tabId: Tab.Id;
@@ -62,6 +65,8 @@ const props = withDefaults(defineProps<Props>(), {
 const emits = defineEmits<{
   'remove-widget': [Widget.Id]
 }>();
+const { updateWidget } = inject<DashboardProvider>(PROVIDE_KEY.DASHBOARD) as DashboardProvider;
+const toast = inject<ToastProviderProps>(PROVIDE_KEY.TOAST) || { show: () => {} };
 
 const getWidgetComponent = (typeCode: Widget.Type): AsyncComponentLoader => {
   return defineAsyncComponent(() => import(`~/components/Widget/Type/${typeCode}.vue`)
@@ -104,7 +109,10 @@ const handleUpdateSetting = (settingData: WidgetOptionSettingForm) => {
       }
     })
   };
-  useFetch(`/api/dashboard/${props.tabId}/widget/${props.data.id}`, { method: 'PATCH', body: JSON.stringify(body) });
+  updateWidget(props.tabId, props.data.id, body)
+    .then(() => {
+      toast.show({ message: 'widget updated' });
+    });
 };
 </script>
 
@@ -131,3 +139,4 @@ const handleUpdateSetting = (settingData: WidgetOptionSettingForm) => {
   }
 }
 </style>
+../../composables/useGridLayout

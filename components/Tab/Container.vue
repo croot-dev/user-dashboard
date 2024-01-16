@@ -21,7 +21,9 @@
         :transition="false"
         :reverse-transition="false"
       >
-        <DashboardContainer v-if="tabIndex === currentTabIndex" :tab-data="tabData" />
+        <DashboardProvider :widgets="tabData.widgets">
+          <DashboardContainer v-if="tabIndex === currentTabIndex" :tab-data="tabData" />
+        </DashboardProvider>
       </v-window-item>
     </v-window>
   </div>
@@ -31,6 +33,7 @@
 import { ref } from 'vue';
 import type { Tab } from '~/types';
 import DashboardContainer from '~/components/Dashboard/Container.vue';
+import DashboardProvider from '~/providers/DashboardProvider.vue';
 
 // handle list data
 const tabList = ref<Tab.Item[]>([]);
