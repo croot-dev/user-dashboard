@@ -1,10 +1,12 @@
 // @ts-nocheck
 import { defineStore } from 'pinia';
 import { parse } from 'papaparse';
+import { wealthByAgeGroupData } from './data/wealthByAgeGroup';
 import { toSnakeCase } from '~/utils';
+import { DATA_SOURCE_TYPE } from '~/constants';
 
 export const useDatasetStore = defineStore('dataset', () => {
-  const dataset = ref();
+  const dataset = ref([]);
   const initialized = ref(false);
   const load = () => {
     initialized.value = false;
@@ -13,51 +15,47 @@ export const useDatasetStore = defineStore('dataset', () => {
         header: true,
         download: true,
         complete ({ data }) {
-          const result = data.map((originalData) => {
-            const nestedJSON = {};
-            for (const key in originalData) {
-              const keys = key.split('.');
-              let nestedObj = nestedJSON;
+          // const result = data.map((originalData) => {
+          //   const nestedJSON = {};
+          //   for (const key in originalData) {
+          //     const keys = key.split('.');
+          //     let nestedObj = nestedJSON;
 
-              for (let i = 0; i < keys.length; i++) {
-                const currentKey = toSnakeCase(keys[i]);
-                if (i === keys.length - 1) {
-                  nestedObj[currentKey] = originalData[key];
-                } else {
-                  nestedObj[currentKey] = nestedObj[currentKey] || {};
-                  nestedObj = nestedObj[currentKey];
-                }
-              }
-            }
-            return nestedJSON;
-          });
+          //     for (let i = 0; i < keys.length; i++) {
+          //       const currentKey = toSnakeCase(keys[i]);
+          //       if (i === keys.length - 1) {
+          //         nestedObj[currentKey] = originalData[key];
+          //       } else {
+          //         nestedObj[currentKey] = nestedObj[currentKey] || {};
+          //         nestedObj = nestedObj[currentKey];
+          //       }
+          //     }
+          //   }
+          //   return nestedJSON;
+          // });
 
-          dataset.value = result;
+          dataset.value = data;
           initialized.value = true;
         }
       });
     });
   };
 
-  const wealthByAgeGroup = computed(() => {
-    const result = new Map();
-    dataset.value.forEach((row) => {
-      if (!row?.demographics?.age) {
-        return;
-      }
-      const group = Math.floor(row.demographics.age / 10);
-      if (group < 1) {
-        return;
-      }
-      const value = Number(row?.wealth?.worth_in_billions || 0);
-      if (result.has(group)) {
-        // const sample = result.get(group) + value
-      } else {
-        result.set(group, value);
-      }
-    });
-    return Array.from(result, ([name, value]) => ({ name: `${name}0대`, value })).sort((a, b) => (a.name > b.name) ? 1 : -1);
-  });
+  const wealthByAgeGroup = computed(() => wealthByAgeGroupData(dataset.value));
 
-  return { dataset, load, initialized, wealthByAgeGroup };
+  const get = (sourceType: typeof DATA_SOURCE_TYPE[keyof typeof DATA_SOURCE_TYPE]) => {
+    switch (sourceType) {
+    case DATA_SOURCE_TYPE.WEALTH_BY_AGE_GROUP:
+      return wealthByAgeGroup.value;
+    default:
+      return dataset.value;
+    }
+  };
+
+  return {
+    dataset,
+    load,
+    initialized,
+    get
+  };
 });

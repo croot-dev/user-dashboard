@@ -1,47 +1,73 @@
 <template>
-  <BarChart
-    :key="height"
-    ref="chartRef"
-    :chart-data="(chartData as unknown as ChartDataType<'bar'>)"
-    :width="width"
-    :height="height"
-    :options="{
-      responsive: true,
-      maintainAspectRatio: false
-    }"
-  />
+  <div class="widget" :style="{ height: height+'px' }">
+    <v-chart
+      class="chart"
+      :option="option"
+    />
+  </div>
 </template>
 <script setup lang="ts">
-import { BarChart } from 'vue-chart-3';
-import type { Chart, ChartData as ChartDataType } from 'chart.js';
-const { wealthByAgeGroup } = useDatasetStore();
+import VChart from 'vue-echarts';
+import type { DatasetComponentOption, EChartsOption, BarSeriesOption } from 'echarts';
+import type { Widget } from '~/types';
 
-defineProps<{
+const props = defineProps<{
   title: string;
   width: number;
   height: number;
+  dataSource: DatasetComponentOption['source'];
+  chartOption?: BarSeriesOption[];
+  content?: Widget.ContentBarChart;
 }>();
 
-const chartRef = ref<Chart>();
-const chartData = reactive<ChartDataType <'bar', {name: string, value: number} []>>({
-  datasets: [{ data: [] }]
+const option = reactive<EChartsOption>({
+  grid: {
+    left: 30,
+    right: 10,
+    bottom: 30,
+    top: 30
+  },
+  dataset: [],
+  xAxis: { type: 'category' },
+  yAxis: { type: 'value' },
+  tooltip: { show: true },
+  legend: { show: true },
+  series: []
 });
-watch(() => wealthByAgeGroup, () => {
-  chartData.datasets = [{
-    label: 'Wealth by age group',
-    data: wealthByAgeGroup,
-    parsing: {
-      xAxisKey: 'name',
-      yAxisKey: 'value'
-    }
-  }];
+
+const updateSeries = () => {
+  const yAxis = props.content?.yAxis;
+  if (Array.isArray(yAxis)) {
+    option.series = yAxis.map((name) => {
+      return {
+        type: 'bar',
+        name,
+        encode: {
+          x: props.content?.xAxis,
+          y: name
+        }
+      };
+    });
+  }
+};
+
+// set chart dataset
+watch(() => props.dataSource, (source) => {
+  option.dataset = [
+    { source }
+  ];
+  updateSeries();
 }, { immediate: true });
 
+watch(() => props.content, ({ xAxis, yAxis }: Widget.ContentBarChart) => {
+  if (option.dataset?.source) {
+    updateSeries();
+  }
+}, { immediate: true });
 </script>
-<style lang="scss" scoped>
-.widget {
-  width: 100%;
+
+<style lang="scss">
+.chart {
   height: 100%;
-  background: #fff center/cover no-repeat;
 }
 </style>

@@ -43,39 +43,42 @@
       </template>
     </v-col>
   </v-row>
-  <GridLayout
-    v-model:layout="layout"
-    :col-num="4"
-    :max-rows="isEditMode ? Infinity : 4"
-    :row-height="240"
-    :is-draggable="isEditMode"
-    :is-resizable="isEditMode"
-    :responsive="false"
-    :vertical-compact="true"
-  >
-    <GridItem
-      v-for="(item, index) in layout"
-      :key="index"
-      :static="item.static"
-      :x="item.x"
-      :y="item.y"
-      :w="item.w"
-      :h="item.h"
-      :i="item.i"
-      :max-w="2"
-      :max-h="2"
-      class="grid-item"
+
+  <client-only>
+    <GridLayout
+      v-model:layout="layout"
+      :col-num="4"
+      :max-rows="isEditMode ? Infinity : 4"
+      :row-height="240"
+      :is-draggable="isEditMode"
+      :is-resizable="isEditMode"
+      :responsive="false"
+      :vertical-compact="true"
     >
-      <WidgetContainer
-        :tab-id="tabData.id"
-        :data="item.data"
-        :global-setting="tabData.globalSetting"
-        :hide-content="isEditMode && isHideContent"
-        :is-edit="isEditMode"
-        @remove-widget="handleRemoveWidget(item.i)"
-      />
-    </GridItem>
-  </GridLayout>
+      <GridItem
+        v-for="(item, index) in layout"
+        :key="index"
+        :static="item.static"
+        :x="item.x"
+        :y="item.y"
+        :w="item.w"
+        :h="item.h"
+        :i="item.i"
+        :max-w="2"
+        :max-h="2"
+        class="grid-item"
+      >
+        <WidgetContainer
+          :tab-id="tabData.id"
+          :data="item.data"
+          :global-setting="tabData.globalSetting"
+          :hide-content="isEditMode && isHideContent"
+          :is-edit="isEditMode"
+          @remove-widget="handleRemoveWidget(item.i)"
+        />
+      </GridItem>
+    </GridLayout>
+  </client-only>
 </template>
 
 <script setup lang="ts">

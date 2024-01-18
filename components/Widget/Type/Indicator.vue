@@ -3,7 +3,7 @@
     class="widget"
     :style="{
       height: `${data.height}px`,
-      ...('imagesrc' in data && { backgroundImage: `url(${data.imagesrc})`})
+      ...(data.imagesrc && { backgroundImage: `url(${data.imagesrc})`})
     }"
   >
     <h2 v-if="'maintext' in data">

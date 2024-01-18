@@ -43,7 +43,7 @@ export const useTemplate = (type: Values<typeof CODE>) => {
     return newObject;
   };
 
-  const getWidgetTemplate = <T = Widget.ContentA>(customWidgetObject: Partial<Widget.Item>) => {
+  const getWidgetTemplate = <T = Widget.ContentIndicator>(customWidgetObject: Partial<Widget.Item>) => {
     const newObject = deepMerge.all([
       {},
       template[type],

@@ -15,4 +15,9 @@ export const WIDGET_TYPE = {
   PIE: 'Pie',
   BAR: 'Bar',
   LINE: 'Line'
-};
+} as const;
+
+export const DATA_SOURCE_TYPE = {
+  EMPTY: '',
+  WEALTH_BY_AGE_GROUP: 'WealthByAgeGroup'
+} as const;

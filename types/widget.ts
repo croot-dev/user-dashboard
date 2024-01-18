@@ -1,4 +1,5 @@
-import { WIDGET_TYPE } from '~/constants';
+import type { LineSeriesOption } from 'echarts';
+import { DATA_SOURCE_TYPE, WIDGET_TYPE } from '~/constants';
 export namespace Widget {
     export type Id = string;
 
@@ -8,6 +9,7 @@ export namespace Widget {
     }
     export interface Content {
         title: string;
+        dataSource: typeof DATA_SOURCE_TYPE[keyof typeof DATA_SOURCE_TYPE];
     }
 
     export type Type = typeof WIDGET_TYPE[keyof typeof WIDGET_TYPE]
@@ -23,10 +25,21 @@ export namespace Widget {
         content: T & Content;
     }
 
-    export interface ContentA extends Content {
+    export interface ContentIndicator extends Content {
         maintext: string;
         caption?: string;
         imagesrc?: string;
+    }
+    export interface ContentLineChart extends Content {
+        dataSource: typeof DATA_SOURCE_TYPE[keyof typeof DATA_SOURCE_TYPE];
+        xAxis: string;
+        yAxis: string[];
+    }
+
+    export interface ContentBarChart extends Content {
+        dataSource: typeof DATA_SOURCE_TYPE[keyof typeof DATA_SOURCE_TYPE];
+        xAxis: string;
+        yAxis: string[];
     }
 
 }

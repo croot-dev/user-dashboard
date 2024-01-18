@@ -19,6 +19,7 @@
         :title="$props.data.content.title"
         :width="cardStyle.width"
         :height="cardStyle.height"
+        :data-source="dataSource"
         v-bind="{ ...$props.data }"
       />
     </v-card-item>
@@ -29,6 +30,9 @@
           v-bind="{
             title: $props.data.content.title,
             type: $props.data.type,
+            dataSource: $props.data.content.dataSource,
+            ...($props.data.content.xAxis && { xAxis: $props.data.content.xAxis }),
+            ...($props.data.content.yAxis && { yAxis: $props.data.content.yAxis }),
             useLocalSetting,
             ...(useLocalSetting && { ...props.data.setting })
           }"
@@ -45,7 +49,7 @@ import type { AsyncComponentLoader } from 'vue';
 import WidgetOptionSetting, { type WidgetOptionSettingForm } from './OptionSetting.vue';
 import WidgetOptionRemove from './OptionRemove.vue';
 import type { Tab, Widget } from '~/types';
-import { PROVIDE_KEY } from '~/constants';
+import { DATA_SOURCE_TYPE, PROVIDE_KEY } from '~/constants';
 import type { ToastProviderProps } from '~/providers/ToastProvider.vue';
 import type { DashboardProvider } from '~/providers/DashboardProvider.vue';
 
@@ -68,6 +72,7 @@ const emits = defineEmits<{
 const { updateWidget } = inject<DashboardProvider>(PROVIDE_KEY.DASHBOARD) as DashboardProvider;
 const toast = inject<ToastProviderProps>(PROVIDE_KEY.TOAST) || { show: () => {} };
 
+// set widget component
 const getWidgetComponent = (typeCode: Widget.Type): AsyncComponentLoader => {
   return defineAsyncComponent(() => import(`~/components/Widget/Type/${typeCode}.vue`)
     .catch((error) => {
@@ -76,11 +81,6 @@ const getWidgetComponent = (typeCode: Widget.Type): AsyncComponentLoader => {
     }));
 };
 const component = computed(() => getWidgetComponent(props.data.type));
-const cardRef = shallowRef<VCard>();
-const cardStyle = reactive({
-  width: 0,
-  height: 0
-});
 const useLocalSetting = computed(() => { return !!(props.data.setting && 'startDate' in props.data.setting && 'endDate' in props.data.setting); });
 const subtitle = computed(() => (
   (useLocalSetting.value)
@@ -88,6 +88,12 @@ const subtitle = computed(() => (
     : `${props.globalSetting.startDate} ~ ${props.globalSetting.endDate}`
 ));
 
+// set widget size
+const cardRef = shallowRef<VCard>();
+const cardStyle = reactive({
+  width: 0,
+  height: 0
+});
 onMounted(() => {
   // Grid 적용으로 인한 강제 제어 순서 변경
   nextTick(() => {
@@ -98,10 +104,30 @@ onMounted(() => {
   });
 });
 
+// set widget data
+const dataset = useDatasetStore();
+const dataSource = ref();
+watch(() => dataset.initialized, (initialized) => {
+  if (initialized) {
+    const sourceType = props.data.content?.dataSource;
+    if (sourceType) {
+      dataSource.value = dataset.get(sourceType);
+    } else {
+      dataSource.value = dataset.dataset;
+    }
+  }
+}, { immediate: true });
+
+// handle widget setting
 const handleUpdateSetting = (settingData: WidgetOptionSettingForm) => {
   const body: Partial<Widget.Item> = {
     type: settingData.type || props.data.type,
-    content: { title: settingData.title || props.data.content.title },
+    content: {
+      title: settingData.title || props.data.content.title,
+      dataSource: settingData.dataSource,
+      ...(settingData.xAxis && { xAxis: settingData.xAxis }),
+      ...(settingData.yAxis && { yAxis: settingData.yAxis })
+    },
     ...(settingData.useLocalSetting && {
       setting: {
         startDate: settingData.startDate || '',
@@ -139,4 +165,3 @@ const handleUpdateSetting = (settingData: WidgetOptionSettingForm) => {
   }
 }
 </style>
-../../composables/useGridLayout

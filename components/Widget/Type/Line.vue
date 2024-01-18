@@ -1,48 +1,75 @@
 <template>
-  <LineChart
-    :key="height"
-    ref="chartRef"
-    :chart-data="(chartData as unknown as ChartDataType<'line'>)"
-    :width="width"
-    :height="height"
-    :options="{
-      responsive: true,
-      maintainAspectRatio: false
-    }"
-  />
+  <div class="widget" :style="{ height: height+'px' }">
+    <VChart
+      class="chart"
+      :option="option"
+      autoresize
+    />
+  </div>
 </template>
 <script setup lang="ts">
-import { LineChart } from 'vue-chart-3';
-import type { Chart, ChartData as ChartDataType } from 'chart.js';
-import { useDatasetStore } from '~/stores/dataset';
-const { wealthByAgeGroup } = useDatasetStore();
+import type { DatasetComponentOption, EChartsOption, LineSeriesOption } from 'echarts';
+import VChart from 'vue-echarts';
+import type { Widget } from '~/types';
 
-defineProps<{
+const props = defineProps<{
   title: string;
   width: number;
   height: number;
+  dataSource: DatasetComponentOption['source'];
+  chartOption?: LineSeriesOption[];
+  content?: Widget.ContentLineChart;
 }>();
 
-const chartRef = ref<Chart>();
-const chartData = reactive<ChartDataType <'line', {name: string, value: number} []>>({
-  datasets: [{ data: [] }]
+const option = reactive<EChartsOption>({
+  grid: {
+    left: 50,
+    right: 10,
+    bottom: 30,
+    top: 30
+  },
+  dataset: [],
+  xAxis: { type: 'category' },
+  yAxis: { type: 'value' },
+  tooltip: { show: true },
+  legend: { show: true },
+  series: []
 });
-watch(() => wealthByAgeGroup, () => {
-  chartData.datasets = [{
-    label: 'Wealth by age group',
-    data: wealthByAgeGroup,
-    parsing: {
-      xAxisKey: 'name',
-      yAxisKey: 'value'
-    }
-  }];
+
+const updateSeries = () => {
+  const yAxis = props.content?.yAxis;
+  if (Array.isArray(yAxis)) {
+    option.series = yAxis.map((name) => {
+      return {
+        type: 'line',
+        name,
+        encode: {
+          x: props.content?.xAxis,
+          y: name
+        }
+      };
+    });
+  }
+};
+
+// set chart dataset
+watch(() => props.dataSource, (source) => {
+  option.dataset = [
+    { source }
+  ];
+  updateSeries();
+}, { immediate: true });
+
+watch(() => props.content, ({ xAxis, yAxis }: Widget.ContentLineChart) => {
+  if (option.dataset?.source) {
+    updateSeries();
+  }
 }, { immediate: true });
 
 </script>
-<style lang="scss" scoped>
-.widget {
-  width: 100%;
+
+<style lang="scss">
+.chart {
   height: 100%;
-  background: #fff center/cover no-repeat;
 }
 </style>
