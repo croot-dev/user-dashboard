@@ -1,44 +1,63 @@
 <template>
-  <PieChart
-    :key="height"
-    ref="chartRef"
-    :chart-data="(chartData as unknown as ChartDataType<'pie'>)"
-    :width="width"
-    :height="height"
-    :options="{
-      responsive: true,
-      maintainAspectRatio: false
-    }"
-  />
+  <div class="widget" :style="{ height: height+'px' }">
+    <v-chart
+      class="chart"
+      :option="option"
+    />
+  </div>
 </template>
 <script setup lang="ts">
-import { PieChart } from 'vue-chart-3';
-import type { Chart, ChartData as ChartDataType } from 'chart.js';
-const { wealthByAgeGroup } = useDatasetStore();
+import VChart from 'vue-echarts';
+import type { DatasetComponentOption, EChartsOption, BarSeriesOption } from 'echarts';
+import type { Widget } from '~/types';
+import type { WIDGET_TYPE } from '~/constants';
 
-defineProps<{
+const { dataSource, content } = defineProps<{
   title: string;
   width: number;
   height: number;
+  dataSource: DatasetComponentOption['source'];
+  chartOption?: BarSeriesOption[];
+  content?: Widget.Content[typeof WIDGET_TYPE.PIE];
 }>();
 
-const chartRef = ref<Chart>();
-const chartData: ChartDataType <'pie', number[]> = reactive({
-  datasets: [{ data: [] }]
+const option = reactive<EChartsOption>({
+  grid: {
+    left: 10,
+    right: 10,
+    bottom: 10,
+    top: 10
+  },
+  dataset: [],
+  tooltip: { show: true },
+  legend: { show: true, type: 'scroll' },
+  series: []
 });
-watch(() => wealthByAgeGroup, () => {
-  chartData.datasets = [{
-    label: 'Wealth by age group',
-    data: wealthByAgeGroup.map(i => Number(i.value))
-  }];
-  chartData.labels = wealthByAgeGroup.map(i => i.name);
+
+const updateSeries = () => {
+  option.series = {
+    type: 'pie',
+    encode: {
+      itemName: content?.name,
+      value: content?.value
+    }
+  };
+};
+
+// set chart dataset
+watch(() => dataSource, (source) => {
+  option.dataset = [
+    { source }
+  ];
 }, { immediate: true });
 
+watch(() => content, () => {
+  updateSeries();
+}, { immediate: true });
 </script>
-<style lang="scss" scoped>
-.widget {
-  width: 100%;
+
+<style lang="scss">
+.chart {
   height: 100%;
-  background: #fff center/cover no-repeat;
 }
 </style>

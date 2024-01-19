@@ -5,7 +5,7 @@
     :loading="loading"
   >
     <v-card-item
-      :title="$props.data.content.title"
+      :title="$props.data.title"
       :subtitle="subtitle"
     >
       <v-skeleton-loader
@@ -16,29 +16,27 @@
       <component
         :is="component"
         v-else
-        :title="$props.data.content.title"
+        v-bind="{ ...$props.data }"
         :width="cardStyle.width"
         :height="cardStyle.height"
         :data-source="dataSource"
-        v-bind="{ ...$props.data }"
       />
     </v-card-item>
 
     <div class="widget-option">
       <v-btn-group>
-        <WidgetOptionSetting
-          v-bind="{
-            title: $props.data.content.title,
+        <WidgetSettingForm
+          :model-value="{
+            title: $props.data.title,
             type: $props.data.type,
-            dataSource: $props.data.content.dataSource,
-            ...($props.data.content.xAxis && { xAxis: $props.data.content.xAxis }),
-            ...($props.data.content.yAxis && { yAxis: $props.data.content.yAxis }),
+            dataSourceType: $props.data.dataSourceType,
+            ...($props.data.content && { content: $props.data.content }),
             useLocalSetting,
             ...(useLocalSetting && { ...props.data.setting })
           }"
           @update:setting="handleUpdateSetting"
         />
-        <WidgetOptionRemove v-if="isEdit" @remove-widget="emits('remove-widget', data.id)" />
+        <WidgetRemoveButton v-if="isEdit" @remove-widget="emits('remove-widget', data.id)" />
       </v-btn-group>
     </div>
   </v-card>
@@ -46,10 +44,10 @@
 <script setup lang="ts">
 import type { VCard } from 'vuetify/lib/components/index.mjs';
 import type { AsyncComponentLoader } from 'vue';
-import WidgetOptionSetting, { type WidgetOptionSettingForm } from './OptionSetting.vue';
-import WidgetOptionRemove from './OptionRemove.vue';
+import WidgetRemoveButton from './RemoveButton.vue';
+import WidgetSettingForm from './Setting/Form.vue';
 import type { Tab, Widget } from '~/types';
-import { DATA_SOURCE_TYPE, PROVIDE_KEY } from '~/constants';
+import { PROVIDE_KEY } from '~/constants';
 import type { ToastProviderProps } from '~/providers/ToastProvider.vue';
 import type { DashboardProvider } from '~/providers/DashboardProvider.vue';
 
@@ -107,27 +105,19 @@ onMounted(() => {
 // set widget data
 const dataset = useDatasetStore();
 const dataSource = ref();
-watch(() => dataset.initialized, (initialized) => {
-  if (initialized) {
-    const sourceType = props.data.content?.dataSource;
-    if (sourceType) {
-      dataSource.value = dataset.get(sourceType);
-    } else {
-      dataSource.value = dataset.dataset;
-    }
-  }
+watch(() => dataset.initialized, async () => {
+  const sourceType = props.data.dataSourceType;
+  const source = await dataset.get(sourceType);
+  dataSource.value = source;
 }, { immediate: true });
 
 // handle widget setting
-const handleUpdateSetting = (settingData: WidgetOptionSettingForm) => {
+const handleUpdateSetting = (settingData: any) => {
   const body: Partial<Widget.Item> = {
     type: settingData.type || props.data.type,
-    content: {
-      title: settingData.title || props.data.content.title,
-      dataSource: settingData.dataSource,
-      ...(settingData.xAxis && { xAxis: settingData.xAxis }),
-      ...(settingData.yAxis && { yAxis: settingData.yAxis })
-    },
+    title: settingData.title || props.data.title,
+    dataSourceType: settingData.dataSourceType,
+    content: settingData.content,
     ...(settingData.useLocalSetting && {
       setting: {
         startDate: settingData.startDate || '',

@@ -10,12 +10,6 @@
 
 <script setup lang="ts">
 import ToastProvider from '~/providers/ToastProvider.vue';
-import { useDatasetStore } from '~/stores/dataset';
-
-const dataset = useDatasetStore();
-if (!dataset.initialized) {
-  dataset.load();
-}
 </script>
 
 <style lang="scss" scoped>

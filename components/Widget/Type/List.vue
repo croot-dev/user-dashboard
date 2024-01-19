@@ -1,30 +1,28 @@
 <template>
-  <v-data-table
-    :height="height"
-    :items="data"
-    :items-per-page="-1"
+  <v-data-table-virtual
+    :items="dataSource"
     density="compact"
+    :height="height"
   >
     <template #bottom />
-  </v-data-table>
+  </v-data-table-virtual>
 </template>
 <script setup lang="ts">
-const { wealthByAgeGroup } = useDatasetStore();
+import type { VDataTable } from 'vuetify/lib/components/index.mjs';
+import type { WIDGET_TYPE } from '~/constants';
+import type { Widget } from '~/types';
 
 withDefaults(defineProps<{
   title: string;
   width: number;
   height: number;
+  dataSource: typeof VDataTable['items']
+  content?: Widget.Content[typeof WIDGET_TYPE.LIST];
 }>(), {
   title: 'Undefined',
   width: 240,
   height: 240
 });
-
-const data = ref<any>([]);
-watch(() => wealthByAgeGroup, () => {
-  data.value = wealthByAgeGroup;
-}, { immediate: true });
 
 </script>
 <style lang="scss" scoped>

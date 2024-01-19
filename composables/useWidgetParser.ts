@@ -21,6 +21,8 @@ export const useWidgetParser = () => {
       data: {
         id: widget.id,
         type: widget.type,
+        title: widget.title,
+        dataSourceType: widget.dataSourceType,
         ...(widget.setting && { setting: widget.setting }),
         ...(widget.content && { content: widget.content })
       }
@@ -35,6 +37,8 @@ export const useWidgetParser = () => {
       sizeX: String(widget.w),
       sizeY: String(widget.h),
       type: widget.data.type,
+      title: widget.data.title,
+      dataSourceType: widget.data.dataSourceType,
       setting: toRaw(widget.data.setting),
       content: toRaw(widget.data.content)
     } as Widget.Item<WidgetType>;

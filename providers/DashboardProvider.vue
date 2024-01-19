@@ -12,10 +12,25 @@ import type { ToastProviderProps } from '~/providers/ToastProvider.vue';
 const props = defineProps<{widgets: Widget.Item[]}>();
 const { convertToLayoutItem } = useWidgetParser();
 const toast = inject<ToastProviderProps>(PROVIDE_KEY.TOAST) || { show: () => {} };
+const widgets = ref<Widget.Item[]>(props.widgets);
 const layout = ref<ExpandLayoutItem[]>([]);
-watch(() => props.widgets, (widgets) => {
-  layout.value = widgets.map(item => convertToLayoutItem(item));
-}, { deep: true, immediate: true });
+
+const resetLayout = () => {
+  layout.value = widgets.value.map(item => convertToLayoutItem(item));
+};
+
+const updateLayout = async (dashboardId: Tab.Id, body: Partial<Tab.Item>) => {
+  try {
+    const result = await useFetch(`/api/dashboard/${dashboardId}`, { method: 'PATCH', body: JSON.stringify(body) });
+    if (Array.isArray(result.data.value.widgets)) {
+      widgets.value = result.data.value.widgets;
+      resetLayout();
+    }
+    return result;
+  } catch (error: any) {
+    toast.show({ message: error.message });
+  }
+};
 
 const addItem = (newItem?: Partial<ExpandLayoutItem>) => {
   const { getWidgetTemplate } = useTemplate(CODE.WIDGET);
@@ -24,7 +39,7 @@ const addItem = (newItem?: Partial<ExpandLayoutItem>) => {
     posY: String(layout.value.length + 4),
     sizeX: String(1),
     sizeY: String(1),
-    content: { title: 'New Widget' },
+    title: 'New Widget',
     ...newItem
   });
   layout.value.push(convertToLayoutItem(newWidgetItem));
@@ -34,20 +49,12 @@ const removeItem = (id: Widget.Id) => {
   layout.value.splice(targetIndex, 1);
 };
 
-const updateLayout = async (dashboardId: Tab.Id, body: Partial<Tab.Item>) => {
-  try {
-    const result = await useFetch(`/api/dashboard/${dashboardId}`, { method: 'PATCH', body: JSON.stringify(body) });
-    return result;
-  } catch (error: any) {
-    toast.show({ message: error.message });
-  }
-};
-
 const updateWidget = async <WidgetType, >(tabId: Tab.Id, widgetId: Widget.Id, body: Partial<Widget.Item<WidgetType>>) => {
   try {
     const result = await useFetch< Tab.Item>(`/api/dashboard/${tabId}/widget/${widgetId}`, { method: 'PATCH', body: JSON.stringify(body) });
     if (result.data.value) {
-      layout.value = result.data.value.widgets.map(item => convertToLayoutItem(item));
+      widgets.value = result.data.value.widgets;
+      resetLayout();
     }
     return result;
   } catch (error: any) {
@@ -55,8 +62,11 @@ const updateWidget = async <WidgetType, >(tabId: Tab.Id, widgetId: Widget.Id, bo
   }
 };
 
+resetLayout();
+
 export interface DashboardProvider {
   layout: typeof layout;
+  resetLayout: typeof resetLayout;
   updateLayout: typeof updateLayout;
   updateWidget: typeof updateWidget;
   addItem: typeof addItem;
@@ -64,6 +74,7 @@ export interface DashboardProvider {
 }
 provide<DashboardProvider>(PROVIDE_KEY.DASHBOARD, {
   layout,
+  resetLayout,
   updateLayout,
   updateWidget,
   addItem,

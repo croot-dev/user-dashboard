@@ -10,8 +10,7 @@ import {
   TooltipComponent,
   LegendComponent,
   GridComponent,
-  DatasetComponent,
-  TransformComponent
+  DatasetComponent
 } from 'echarts/components';
 import { use } from 'echarts/core';
 

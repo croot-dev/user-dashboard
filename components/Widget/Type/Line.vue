@@ -10,20 +10,21 @@
 <script setup lang="ts">
 import type { DatasetComponentOption, EChartsOption, LineSeriesOption } from 'echarts';
 import VChart from 'vue-echarts';
+import type { WIDGET_TYPE } from '~/constants';
 import type { Widget } from '~/types';
 
-const props = defineProps<{
+const { dataSource, content } = defineProps<{
   title: string;
   width: number;
   height: number;
   dataSource: DatasetComponentOption['source'];
   chartOption?: LineSeriesOption[];
-  content?: Widget.ContentLineChart;
+  content?: Widget.Content[typeof WIDGET_TYPE.LINE];
 }>();
 
 const option = reactive<EChartsOption>({
   grid: {
-    left: 50,
+    left: 40,
     right: 10,
     bottom: 30,
     top: 30
@@ -31,20 +32,20 @@ const option = reactive<EChartsOption>({
   dataset: [],
   xAxis: { type: 'category' },
   yAxis: { type: 'value' },
-  tooltip: { show: true },
-  legend: { show: true },
+  tooltip: { show: true, trigger: 'axis' },
+  legend: { show: true, type: 'scroll' },
   series: []
 });
 
 const updateSeries = () => {
-  const yAxis = props.content?.yAxis;
+  const yAxis = content?.yAxis;
   if (Array.isArray(yAxis)) {
     option.series = yAxis.map((name) => {
       return {
         type: 'line',
         name,
         encode: {
-          x: props.content?.xAxis,
+          x: content?.xAxis,
           y: name
         }
       };
@@ -53,17 +54,14 @@ const updateSeries = () => {
 };
 
 // set chart dataset
-watch(() => props.dataSource, (source) => {
+watch(() => dataSource, (source) => {
   option.dataset = [
     { source }
   ];
-  updateSeries();
 }, { immediate: true });
 
-watch(() => props.content, ({ xAxis, yAxis }: Widget.ContentLineChart) => {
-  if (option.dataset?.source) {
-    updateSeries();
-  }
+watch(() => content, () => {
+  updateSeries();
 }, { immediate: true });
 
 </script>

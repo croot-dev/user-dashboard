@@ -27,7 +27,11 @@ const template: Template = {
     sizeY: '',
     posX: '',
     posY: '',
-    content: { title: '' }
+    title: '',
+    dataSourceType: '',
+    content: {
+      maintext: ''
+    }
   }
 };
 
@@ -43,7 +47,7 @@ export const useTemplate = (type: Values<typeof CODE>) => {
     return newObject;
   };
 
-  const getWidgetTemplate = <T = Widget.ContentIndicator>(customWidgetObject: Partial<Widget.Item>) => {
+  const getWidgetTemplate = <T = Widget.Content[typeof WIDGET_TYPE.INDICATOR]>(customWidgetObject: Partial<Widget.Item>) => {
     const newObject = deepMerge.all([
       {},
       template[type],

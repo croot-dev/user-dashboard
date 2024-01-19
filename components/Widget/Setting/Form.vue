@@ -39,24 +39,25 @@
             </v-row>
             <v-row no-gutters>
               <v-select
-                v-model="form.dataSource"
-                :items="dataSourceOptions"
+                v-model="form.dataSourceType"
+                :items="dataSourceTypeOptions"
                 label="Data Source"
                 required
                 hide-details
                 density="compact"
               />
             </v-row>
-            <OptionSettingAxis
-              v-if="showAxisForm"
-              :model-value="{
-                xAxis: form.xAxis,
-                yAxis: form.yAxis
-              }"
-              :type="form.type"
-              :data-source="form.dataSource"
-              @update:model-value="onUpdateAxis"
-            />
+            <v-row no-gutters>
+              <component
+                :is="customFormField"
+                :model-value="{
+                  ...form.content
+                }"
+                :type="form.type"
+                :data-source-type="form.dataSourceType"
+                @update:model-value="onUpdateCustomField"
+              />
+            </v-row>
             <v-row no-gutters>
               <v-switch
                 v-model="form.useLocalSetting"
@@ -110,62 +111,61 @@
 </template>
 
 <script setup lang="ts">
-import OptionSettingAxis from './OptionSettingAxis.vue';
 import { WIDGET_TYPE, DATA_SOURCE_TYPE } from '~/constants';
 import type { Widget } from '~/types';
 
-interface Props {
-  title?: string;
+interface FormData {
+  title: string;
   type: Widget.Type;
-  dataSource: Widget.Content['dataSource'];
-  xAxis: string | void;
-  yAxis: string[];
+  dataSourceType: Widget.Item['dataSourceType'];
   useLocalSetting: boolean;
-  startDate?: Widget.Setting['startDate'] | null;
-  endDate?: Widget.Setting['endDate'] | null;
-}
-export interface WidgetOptionSettingForm extends Props {}
-export interface AxisForm {
-  xAxis: WidgetOptionSettingForm['xAxis'];
-  yAxis: WidgetOptionSettingForm['yAxis'];
+  startDate?: Widget.Setting['startDate'];
+  endDate?: Widget.Setting['endDate'];
+  [key:string]: any;
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  title: '',
-  type: WIDGET_TYPE.INDICATOR,
-  dataSource: DATA_SOURCE_TYPE.EMPTY,
-  startDate: null,
-  endDate: null
+interface Props {
+  modelValue: FormData
+}
+
+const { modelValue } = withDefaults(defineProps<Props>(), {
+  modelValue: () => ({
+    title: 'Untitled',
+    type: WIDGET_TYPE.INDICATOR,
+    dataSourceType: DATA_SOURCE_TYPE.EMPTY,
+    useLocalSetting: false,
+    startDate: undefined,
+    endDate: undefined
+  })
 });
 const emits = defineEmits<{
-  'update:setting': [WidgetOptionSettingForm]
+  'update:setting': [FormData]
 }>();
 
 const isActive = ref(false);
-const form = reactive<Props>({
-  title: props.title,
-  type: props.type,
-  xAxis: props.xAxis,
-  yAxis: props.yAxis,
-  dataSource: props.dataSource,
-  useLocalSetting: props.useLocalSetting,
-  startDate: props.useLocalSetting ? props.startDate : null,
-  endDate: props.useLocalSetting ? props.endDate : null
-});
+const form = reactive<FormData>({ ...modelValue });
 const widgetTypeOptions = ref(Object.entries(WIDGET_TYPE).map(([title, value]) => ({ title, value })));
-const dataSourceOptions = ref(Object.entries(DATA_SOURCE_TYPE).map(([title, value]) => ({ title, value })));
+const dataSourceTypeOptions = ref(Object.entries(DATA_SOURCE_TYPE).map(([title, value]) => ({ title, value })));
 
-const showAxisForm = computed(() => [WIDGET_TYPE.BAR, WIDGET_TYPE.LINE, WIDGET_TYPE.PIE].includes(form.type));
-const onUpdateType = (widgetType: Widget.Type) => {
-  if (!showAxisForm) {
-    form.xAxis = undefined;
-    form.yAxis = undefined;
+const customFormField = computed(() => {
+  switch (form.type) {
+  case WIDGET_TYPE.BAR:
+  case WIDGET_TYPE.LINE:
+    return defineAsyncComponent(() => import('./AxisChartFields.vue'));
+  case WIDGET_TYPE.PIE:
+    return defineAsyncComponent(() => import('./PieChartFields.vue'));
+  case WIDGET_TYPE.SCATTER:
+  default:
+    return {};
   }
+});
+
+const onUpdateType = (widgetType: Widget.Type) => {
+  form.content = {};
 };
 
-const onUpdateAxis = (axisForm: AxisForm) => {
-  form.xAxis = axisForm.xAxis;
-  form.yAxis = axisForm.yAxis;
+const onUpdateCustomField = (customFields: Widget.Content[typeof form.type]) => {
+  form.content = customFields;
 };
 
 const onClickEdit = () => {

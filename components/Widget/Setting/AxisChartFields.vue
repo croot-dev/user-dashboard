@@ -28,31 +28,35 @@
 </template>
 
 <script setup lang="ts">
-import type { AxisForm } from './OptionSetting.vue';
 import { DATA_SOURCE_TYPE } from '~/constants';
 import type { Widget } from '~/types';
 
+export interface AxisFormItems {
+  xAxis: string | void;
+  yAxis: string[];
+}
+
 interface Props {
   type: Widget.Type;
-  dataSource: typeof DATA_SOURCE_TYPE[keyof typeof DATA_SOURCE_TYPE];
-  modelValue?: AxisForm
+  dataSourceType: typeof DATA_SOURCE_TYPE[keyof typeof DATA_SOURCE_TYPE];
+  modelValue?: AxisFormItems
 }
-export interface WidgetOptionSettingAxisForm extends Props {}
+
 const props = defineProps<Props>();
 const emits = defineEmits<{
-  'update:modelValue': [AxisForm]
+  'update:modelValue': [AxisFormItems]
 }>();
 
-const form = reactive<AxisForm>({
+const form = reactive<AxisFormItems>({
   xAxis: props.modelValue?.xAxis,
-  yAxis: props.modelValue?.yAxis
+  yAxis: props.modelValue?.yAxis || []
 });
 
 const dataset = useDatasetStore();
 const dataLabels = ref<string[]>([]);
-watch(() => props.dataSource, (value) => {
+watch(() => props.dataSourceType, async (value) => {
   dataLabels.value = [];
-  const source: any[] = dataset.get(value);
+  const source = await dataset.get(value);
   if (Array.isArray(source[0])) {
     dataLabels.value = source[0];
   } else {

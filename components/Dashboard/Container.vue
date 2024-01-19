@@ -57,7 +57,7 @@
     >
       <GridItem
         v-for="(item, index) in layout"
-        :key="index"
+        :key="`${index}-${JSON.stringify(item)}`"
         :static="item.static"
         :x="item.x"
         :y="item.y"
@@ -102,10 +102,10 @@ const props = defineProps<Props>();
 const toast = inject<ToastProviderProps>(PROVIDE_KEY.TOAST) as ToastProviderProps;
 
 // handle layout data
-const lastUpdateTime = ref('');
-const dataset = useDatasetStore();
+const lastUpdateTime = ref(new Date().toISOString());
 const {
   layout,
+  resetLayout,
   updateLayout,
   addItem: addLayoutItem,
   removeItem: removeLayoutItem
@@ -114,9 +114,11 @@ const {
   convertToWidgetItem
 } = useWidgetParser();
 const reset = () => {
+  resetLayout();
   lastUpdateTime.value = new Date().toISOString();
 };
-watch(() => dataset.initialized, (loaded) => { (loaded) && reset(); }, { immediate: true });
+// const dataset = useDatasetStore();
+// watch(() => dataset.initialized, (loaded) => { (loaded) && reset(); }, { immediate: true });
 
 // handle mode
 const isEditMode = ref(false);
@@ -168,6 +170,7 @@ const onClickAdd = () => {
 const handleRemoveWidget = (id: Widget.Id) => {
   removeLayoutItem(id);
 };
+
 </script>
 
 <style lang="scss" scoped>

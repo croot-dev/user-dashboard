@@ -14,7 +14,8 @@ export const WIDGET_TYPE = {
   LIST: 'List',
   PIE: 'Pie',
   BAR: 'Bar',
-  LINE: 'Line'
+  LINE: 'Line',
+  SCATTER: 'Scatter'
 } as const;
 
 export const DATA_SOURCE_TYPE = {

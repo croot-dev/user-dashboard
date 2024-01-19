@@ -39,12 +39,16 @@ import DashboardProvider from '~/providers/DashboardProvider.vue';
 const tabList = ref<Tab.Item[]>([]);
 const currentTabIndex = ref<number|null>(null);
 const getDashboardList = async () => {
-  const { data } = await useFetch<Tab.Item[]>('/api/dashboard');
-  if (data.value) {
-    tabList.value = data.value;
-    if (data.value.length > 0) {
-      currentTabIndex.value = 0;
+  try {
+    const { data } = await useFetch<Tab.Item[]>('/api/dashboard');
+    if (data.value) {
+      tabList.value = data.value;
+      if (data.value.length > 0) {
+        currentTabIndex.value = 0;
+      }
     }
+  } catch (error) {
+    debugger;
   }
 };
 getDashboardList();

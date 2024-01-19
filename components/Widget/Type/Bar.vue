@@ -10,14 +10,15 @@
 import VChart from 'vue-echarts';
 import type { DatasetComponentOption, EChartsOption, BarSeriesOption } from 'echarts';
 import type { Widget } from '~/types';
+import type { WIDGET_TYPE } from '~/constants';
 
-const props = defineProps<{
+const { dataSource, content } = defineProps<{
   title: string;
   width: number;
   height: number;
   dataSource: DatasetComponentOption['source'];
   chartOption?: BarSeriesOption[];
-  content?: Widget.ContentBarChart;
+  content?: Widget.Content[typeof WIDGET_TYPE.BAR];
 }>();
 
 const option = reactive<EChartsOption>({
@@ -31,19 +32,19 @@ const option = reactive<EChartsOption>({
   xAxis: { type: 'category' },
   yAxis: { type: 'value' },
   tooltip: { show: true },
-  legend: { show: true },
+  legend: { show: true, type: 'scroll' },
   series: []
 });
 
 const updateSeries = () => {
-  const yAxis = props.content?.yAxis;
+  const yAxis = content?.yAxis;
   if (Array.isArray(yAxis)) {
     option.series = yAxis.map((name) => {
       return {
         type: 'bar',
         name,
         encode: {
-          x: props.content?.xAxis,
+          x: content?.xAxis,
           y: name
         }
       };
@@ -52,17 +53,14 @@ const updateSeries = () => {
 };
 
 // set chart dataset
-watch(() => props.dataSource, (source) => {
+watch(() => dataSource, (source) => {
   option.dataset = [
     { source }
   ];
-  updateSeries();
 }, { immediate: true });
 
-watch(() => props.content, ({ xAxis, yAxis }: Widget.ContentBarChart) => {
-  if (option.dataset?.source) {
-    updateSeries();
-  }
+watch(() => content, () => {
+  updateSeries();
 }, { immediate: true });
 </script>
 
