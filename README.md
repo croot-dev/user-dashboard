@@ -1,4 +1,5 @@
 # User Dashboard
+![Alt text](preview.gif)
 ![Alt text](image-1.png)
 
 ## 기능목록
