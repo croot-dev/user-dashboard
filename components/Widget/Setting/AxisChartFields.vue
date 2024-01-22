@@ -54,20 +54,21 @@ const form = reactive<AxisFormItems>({
 
 const dataset = useDatasetStore();
 const dataLabels = ref<string[]>([]);
-watch(() => props.dataSourceType, async (value) => {
-  dataLabels.value = [];
-  const source = await dataset.get(value);
+
+const setDataLabels = async () => {
+  const source = await dataset.get(props.dataSourceType);
   if (Array.isArray(source[0])) {
     dataLabels.value = source[0];
   } else {
     dataLabels.value = Object.keys(source[0]);
   }
-
-  if (!dataLabels.value.includes(form.xAxis) || !form.yAxis.every(item => dataLabels.value.includes(item))) {
-    form.xAxis = undefined;
-    form.yAxis = [];
-  }
-}, { immediate: true });
+};
+setDataLabels();
+watch(() => props.dataSourceType, () => {
+  form.xAxis = undefined;
+  form.yAxis = [];
+  setDataLabels();
+});
 
 const onUpdateForm = () => {
   emits('update:modelValue', form);

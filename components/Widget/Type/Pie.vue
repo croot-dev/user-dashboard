@@ -3,6 +3,7 @@
     <v-chart
       class="chart"
       :option="option"
+      autoresize
     />
   </div>
 </template>

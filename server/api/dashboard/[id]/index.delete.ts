@@ -19,8 +19,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const origin = await storage.getItem<Tab.Item[]>('dashboard') || [];
-  const deleted = origin.splice(targetIndex, 1);
-  await storage.setItem('dashoard', origin);
+  const deleted = data.splice(targetIndex, 1);
+  await storage.setItem('dashboard', data);
   return deleted;
 });

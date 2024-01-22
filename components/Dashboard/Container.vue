@@ -7,7 +7,7 @@
       />
     </v-col>
   </v-row>
-  <v-row>
+  <v-row align="center">
     <v-col>
       Last Updated: {{ dayjs(lastUpdateTime).format('YYYY-MM-DD HH:mm:ss') }}
       <v-btn
@@ -25,12 +25,14 @@
         v-model="isEditMode"
         :label="isEditMode? 'edit' : 'read'"
         hide-details
+        density="compact"
         @update:model-value="onUpdateMode"
       />
       <v-checkbox
         v-if="isEditMode"
         v-model="isHideContent"
         hide-details
+        density="compact"
         label="hide content"
       />
       <template v-if="isEditMode">
@@ -44,41 +46,41 @@
     </v-col>
   </v-row>
 
-  <client-only>
-    <GridLayout
-      v-model:layout="layout"
-      :col-num="4"
-      :max-rows="isEditMode ? Infinity : 4"
-      :row-height="240"
-      :is-draggable="isEditMode"
-      :is-resizable="isEditMode"
-      :responsive="false"
-      :vertical-compact="true"
+  <GridLayout
+    v-model:layout="layout"
+    :col-num="4"
+    :max-rows="isEditMode ? Infinity : 4"
+    :row-height="240"
+    :is-draggable="isEditMode"
+    :is-resizable="isEditMode"
+    :responsive="false"
+  >
+    <GridItem
+      v-for="(item, key) in layout"
+      :key="key"
+      :static="item.static"
+      :x="item.x"
+      :y="item.y"
+      :w="item.w"
+      :h="item.h"
+      :i="item.i"
+      :min-w="1"
+      :min-h="1"
+      :max-w="4"
+      :max-h="2"
+      class="grid-item"
     >
-      <GridItem
-        v-for="(item, index) in layout"
-        :key="`${index}-${JSON.stringify(item)}`"
-        :static="item.static"
-        :x="item.x"
-        :y="item.y"
-        :w="item.w"
-        :h="item.h"
-        :i="item.i"
-        :max-w="2"
-        :max-h="2"
-        class="grid-item"
-      >
-        <WidgetContainer
-          :tab-id="tabData.id"
-          :data="item.data"
-          :global-setting="tabData.globalSetting"
-          :hide-content="isEditMode && isHideContent"
-          :is-edit="isEditMode"
-          @remove-widget="handleRemoveWidget(item.i)"
-        />
-      </GridItem>
-    </GridLayout>
-  </client-only>
+      <WidgetContainer
+        :key="JSON.stringify({'mode': isEditMode, ...item})"
+        :tab-id="tabData.id"
+        :data="item.data"
+        :global-setting="tabData.globalSetting"
+        :hide-content="isEditMode && isHideContent"
+        :is-edit="isEditMode"
+        @remove-widget="handleRemoveWidget(item.i)"
+      />
+    </GridItem>
+  </GridLayout>
 </template>
 
 <script setup lang="ts">
@@ -90,7 +92,6 @@ import type { Tab, Widget } from '~/types';
 import DashboardContainerForm from '~/components/Dashboard/ContainerForm.vue';
 import WidgetContainer from '~/components/Widget/Container.vue';
 import { useTimer } from '~/composables/useTimer';
-import { useDatasetStore } from '~/stores/dataset';
 import { PROVIDE_KEY } from '~/constants';
 import type { ToastProviderProps } from '~/providers/ToastProvider.vue';
 import type { DashboardProvider } from '~/providers/DashboardProvider.vue';

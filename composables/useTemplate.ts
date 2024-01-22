@@ -35,11 +35,11 @@ const template: Template = {
   }
 };
 
-export const useTemplate = (type: Values<typeof CODE>) => {
+export const useTemplate = () => {
   const getTabTemplate = (customTabObject: Partial<Tab.Item>) => {
     const newObject = deepMerge.all([
       {},
-      template[type],
+      template[CODE.TAB],
       customTabObject,
       { id: generateKey(5) }
     ]) as Tab.Item;
@@ -50,7 +50,7 @@ export const useTemplate = (type: Values<typeof CODE>) => {
   const getWidgetTemplate = <T = Widget.Content[typeof WIDGET_TYPE.INDICATOR]>(customWidgetObject: Partial<Widget.Item>) => {
     const newObject = deepMerge.all([
       {},
-      template[type],
+      template[CODE.WIDGET],
       customWidgetObject,
       { id: generateKey(5) }
     ]) as Widget.Item<T>;

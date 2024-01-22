@@ -103,13 +103,14 @@ onMounted(() => {
 });
 
 // set widget data
-const dataset = useDatasetStore();
 const dataSource = ref();
-watch(() => dataset.initialized, async () => {
+const getDataSource = async () => {
+  const dataset = useDatasetStore();
   const sourceType = props.data.dataSourceType;
   const source = await dataset.get(sourceType);
   dataSource.value = source;
-}, { immediate: true });
+};
+getDataSource();
 
 // handle widget setting
 const handleUpdateSetting = (settingData: any) => {

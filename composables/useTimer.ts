@@ -1,13 +1,13 @@
 type TimerID = ReturnType <typeof setTimeout>
 
 export const useTimer = (
-  callback: () => void = () => {},
+  callback: () => Promise<any> | void = () => {},
   delay: number = 10 * 100
 ) => {
-  const timerId = shallowRef<TimerID>();
+  const timerId = shallowRef<TimerID>(0 as unknown as TimerID);
   const isRunning = shallowRef<boolean>(false);
 
-  const start = () => {
+  const start = (): TimerID => {
     const reloader = () => {
       isRunning.value = true;
       timerId.value = setTimeout(async () => {
@@ -21,13 +21,13 @@ export const useTimer = (
     return timerId.value;
   };
 
-  const stop = () => {
+  const stop = (): TimerID => {
     clearTimeout(timerId.value);
     isRunning.value = false;
     return timerId.value;
   };
 
-  const toggle = () => {
+  const toggle = (): TimerID => {
     return (isRunning.value) ? stop() : start();
   };
 
@@ -38,8 +38,8 @@ export const useTimer = (
   });
 
   return {
-    timerId: toRaw(timerId),
-    isRunning: toRaw(isRunning),
+    timerId: readonly(unref(timerId)),
+    isRunning: readonly(toRaw(isRunning)),
     toggle,
     start,
     stop
