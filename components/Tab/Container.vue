@@ -69,7 +69,7 @@ const getDashboardList = async () => {
       }
     }
   } catch (error) {
-    debugger;
+    console.log(error);
   }
 };
 getDashboardList();

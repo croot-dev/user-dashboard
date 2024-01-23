@@ -2,6 +2,22 @@
 ![Alt text](preview.gif)
 ![Alt text](image-1.png)
 
+## 실행
+1. 의존성 설치
+    ```bash
+    yarn  # or yarn install
+    ```
+1. `.env` 환경설정 파일 생성 
+    ```yaml
+    # ~/.env
+    FS_BASE = "./server/db"
+    ```
+1. 로컬 서버 실행
+    ```bash
+    yarn dev
+    ```
+
+
 ## 기능목록
 ### Tab
 - 탭 추가
@@ -43,25 +59,25 @@
 Dashboard 및 Widget의 NoSQL 데이터 템플릿 선언  
 | Name | Type | Desc |
 |---|---|---|
-|getTabTemplate | <code>(Partial<Tab.Item>) => Tab.Item</code> | Dashboard Template 호출 함수 |
-|getWidgetTemplate | <code>(Partial<Widget.Item>) => Widget.Item</code> | Widget Template 호출 함수 | 
+|getTabTemplate | `(Partial<Tab.Item>) => Tab.Item` | Dashboard Template 호출 함수 |
+|getWidgetTemplate | `(Partial<Widget.Item>) => Widget.Item` | Widget Template 호출 함수 | 
 
 #### useTimer.ts
 setTimeout 기반 타이머 선언  
 | Name | Type | Desc |
 |---|---|---|
-|timerId | <code>TimerID</code> | 타이머 ID | 
-|isRunning | <code>boolean</code> | 타이머 실행 여부 |
-| toggle | <code>() => TimerID</code> | 타이머 실행/중지 토글 함수 |
-| start | <code>() => TimerID</code> | 타이머 실행 함수 |
-| stop | <code>() => TimerID</code> | 타이머 중지 함수 |
+|timerId | `TimerID` | 타이머 ID | 
+|isRunning | `boolean` | 타이머 실행 여부 |
+| toggle | `() => TimerID` | 타이머 실행/중지 토글 함수 |
+| start | `() => TimerID` | 타이머 실행 함수 |
+| stop | `() => TimerID` | 타이머 중지 함수 |
 
 ####  useWidgetParser.ts
 위젯 데이텨 파싱
 | Name | Type | Desc |
 |---|---|---|
-| convertToLayoutItem | <code>(Widget.Item) => ExpandLayoutItem</code> | 위젯 데이터를 GridLayout 데이터로 변환 함수 |
-| convertToWidgetItem | <code>(ExpandLayoutItem) => Widget.Item</code> | GridLayout 데이터를 위젯 데이터로 변환 함수 |
+| convertToLayoutItem | `(Widget.Item) => ExpandLayoutItem` | 위젯 데이터를 GridLayout 데이터로 변환 함수 |
+| convertToWidgetItem | `(ExpandLayoutItem) => Widget.Item` | GridLayout 데이터를 위젯 데이터로 변환 함수 |
 
 
 ### providers
@@ -70,17 +86,17 @@ setTimeout 기반 타이머 선언
 **Props**  
 | Name | Type | Desc |
 |---|---|---|
-| widgets | <code>Widget.Item[]</code> | 초기 위젯 데이터 목록 |
+| widgets | `Widget.Item[]` | 초기 위젯 데이터 목록 |
 
 **Inject**  
 | Name | Type | Desc |
 |---|---|---|
-| layout | <code>ExpandLayoutItem[]</code> | Layout 아이템 목록 |
-| resetLayout | <code>() => void</code> | layout 목록 초기화 |
-| updateLayout | <code>(Tab.Id, Partial<Tab.Item>) => Promise<Ref<Tab.Item>></code> | 대시보드 수정 API 호출 |
-| updateWidget | <code>(Tab.Id, Widget.Id, Partial<Widget.Item>) => Promise<Tab.Item></code> | 위젯 목록 수정 API 호출 |
-| addItem | <code>(Partial<ExpandLayoutItem>) => void</code> | layout 아이템 추가 |
-| removeItem | <code>(Widget.Id) => void</code> | layout 아이템 제거 |
+| layout | `ExpandLayoutItem[]` | Layout 아이템 목록 |
+| resetLayout | `() => void` | layout 목록 초기화 |
+| updateLayout | `(Tab.Id, Partial<Tab.Item>) => Promise<Ref<Tab.Item>>` | 대시보드 수정 API 호출 |
+| updateWidget | `(Tab.Id, Widget.Id, Partial<Widget.Item>) => Promise<Tab.Item>` | 위젯 목록 수정 API 호출 |
+| addItem | `(Partial<ExpandLayoutItem>) => void` | layout 아이템 추가 |
+| removeItem | `(Widget.Id) => void` | layout 아이템 제거 |
 
 #### ToastProvider
 토스트(snackbar) 메시지 호출 Provider
@@ -89,8 +105,8 @@ setTimeout 기반 타이머 선언
 **Inject**  
 | Name | Type | Desc |
 |---|---|---|
-| show | <code>({ message: string, color?: string }) => void</code> | 토스트 메시지 표시 |
-| hide | <code>() => void</code> | 토스트 메시지 제거 |
+| show | `({ message: string, color?: string }) => void` | 토스트 메시지 표시 |
+| hide | `() => void` | 토스트 메시지 제거 |
 
 
 ### Stores
