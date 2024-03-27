@@ -35,6 +35,9 @@ const option = reactive<EChartsOption>({
   series: []
 });
 
+/**
+ * 차트 Series 수정
+ */
 const updateSeries = () => {
   option.series = {
     type: 'pie',
@@ -45,19 +48,24 @@ const updateSeries = () => {
   };
 };
 
-// set chart dataset
-watch(() => dataSource, (source) => {
+/**
+ * 차트 Source 수정
+ */
+const updateDataset = () => {
   option.dataset = [
-    { source }
+    { source: dataSource }
   ];
-}, { immediate: true });
+};
 
-watch(() => content, () => {
-  updateSeries();
-}, { immediate: true });
+watch(() => dataSource, updateDataset);
+watch(() => content, updateSeries);
+
+// Initialize
+updateDataset();
+updateSeries();
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .chart {
   height: 100%;
 }

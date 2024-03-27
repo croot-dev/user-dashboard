@@ -51,7 +51,7 @@ import { PROVIDE_KEY } from '~/constants';
 import type { ToastProviderProps } from '~/providers/ToastProvider.vue';
 import type { DashboardProvider } from '~/providers/DashboardProvider.vue';
 
-interface Props {
+interface WidgetContainerProps {
   tabId: Tab.Id;
   data: Widget.Item<any>;
   globalSetting: Tab.GlobalSetting;
@@ -59,7 +59,7 @@ interface Props {
   loading?: boolean;
   hideContent?: boolean;
 }
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<WidgetContainerProps>(), {
   isEdit: false,
   loading: false,
   hideContent: false

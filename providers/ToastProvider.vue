@@ -26,6 +26,11 @@ export interface ToastProviderProps {
   hide: () => void;
 }
 provide<ToastProviderProps>(PROVIDE_KEY.TOAST, {
+  /**
+   * 토스트 메시지를 보여줍니다.
+   * @param {string} options.message 메시지
+   * @param {string} [options.color] 색상 (선택 사항)
+   */
   show (options) {
     message.value = options.message;
     if (options?.color) {
@@ -33,6 +38,9 @@ provide<ToastProviderProps>(PROVIDE_KEY.TOAST, {
     }
     show.value = true;
   },
+  /**
+   * 토스트를 숨깁니다.
+   */
   hide () {
     show.value = false;
   }

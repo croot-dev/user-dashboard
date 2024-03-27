@@ -3,13 +3,18 @@ module.exports = {
     browser: true,
     node: true
   },
-  extends: ['@nuxtjs/eslint-config-typescript', 'plugin:vue/vue3-recommended', 'plugin:nuxt/recommended'],
+  extends: [
+    '@nuxtjs/eslint-config-typescript',
+    'plugin:vue/vue3-recommended',
+    'plugin:nuxt/recommended',
+    'plugin:import/recommended'
+  ],
   overrides: [
     {
+      files: ['*.js', '*.cjs'],
       env: {
         node: true
       },
-      files: ['**/*.cjs'],
       parserOptions: {
         sourceType: 'script'
       }
@@ -23,13 +28,16 @@ module.exports = {
   rules: {
     quotes: ['error', 'single'],
     semi: ['error', 'always'],
-    '@typescript-eslint/no-unused-vars': ['off'],
-    'vue/multi-word-component-names': ['off'],
+    '@typescript-eslint/no-unused-vars': ['warn'],
     indent: ['error', 2],
-    'vue/script-indent': ['error', 2, {
-      baseIndent: 0,
-      switchCase: 0
-    }],
+    'vue/script-indent': [
+      'error',
+      2,
+      {
+        baseIndent: 0,
+        switchCase: 0
+      }
+    ],
     'check-file/folder-naming-convention': [
       'error',
       {
