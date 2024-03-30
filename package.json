@@ -17,13 +17,15 @@
   "packageManager": "yarn@1.22.19",
   "devDependencies": {
     "@babel/eslint-parser": "^7.23.3",
+    "@nabla/vite-plugin-eslint": "^2.0.2",
     "@nuxt/devtools": "^1.0.6",
     "@nuxtjs/eslint-config-typescript": "^12.1.0",
     "@nuxtjs/eslint-module": "^4.1.0",
     "@types/papaparse": "^5.3.14",
     "@typescript-eslint/eslint-plugin": "^6.4.0",
-    "@typescript-eslint/parser": "^6.15.0",
-    "eslint": "^8.0.1",
+    "@typescript-eslint/parser": "^7.4.0",
+    "eslint": "^8.57.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-check-file": "^2.6.2",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-nuxt": "^4.0.0",
@@ -32,7 +34,6 @@
     "nuxt": "^3.7.4",
     "sass": "^1.69.3",
     "typescript": "^5.3.3",
-    "vite-plugin-eslint": "^1.8.1",
     "vite-plugin-vuetify": "^1.0.2",
     "vue": "^3.3.4",
     "vue-router": "^4.2.5",
@@ -51,6 +52,7 @@
     "vue3-grid-layout-next": "^1.0.6"
   },
   "resolutions": {
+    "strip-ansi": "6.0.0",
     "string-width": "4.2.3"
   }
 }

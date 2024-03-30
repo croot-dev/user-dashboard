@@ -1,5 +1,5 @@
+import eslintPlugin from '@nabla/vite-plugin-eslint';
 import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify';
-import eslintPlugin from 'vite-plugin-eslint';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -20,6 +20,7 @@ export default defineNuxtConfig({
     }
     // ...
   ],
+  srcDir: 'src/',
   components: {
     dirs: []
   },
@@ -37,7 +38,7 @@ export default defineNuxtConfig({
   plugins: [{ src: '~/plugins/vue3-grid-layout-next', mode: 'client' }],
   runtimeConfig: {
     public: {
-      baseURL: './'
+      baseURL: '/'
     },
     redis: {
       host: process.env.REDIS_HOST,
