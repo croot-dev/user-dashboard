@@ -1,7 +1,7 @@
 import { Tab } from '~/types';
 
 export default defineEventHandler(async (event) => {
-  const storage = useStorage('fs');
+  const storage = useStorage('redis');
   const dashboardId = getRouterParam(event, 'id');
   if (!dashboardId) {
     throw createError({

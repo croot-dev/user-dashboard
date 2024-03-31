@@ -14,7 +14,7 @@ const DASHBOARD_TEMPLATE: Tab.Item = {
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-  const storage = useStorage('fs');
+  const storage = useStorage('redis');
   const newDashboardId = generateKey(5);
   const newDashboard: Tab.Item = Object.assign({}, DASHBOARD_TEMPLATE, { id: newDashboardId, title: body.title || 'Noname' });
   const origin: Tab.Item[] = await storage.getItem<Tab.Item[]>('dashboard') || [];

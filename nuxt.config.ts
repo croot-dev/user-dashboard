@@ -9,7 +9,6 @@ export default defineNuxtConfig({
     transpile: ['vuetify']
   },
   modules: [
-    // '@nuxtjs/eslint-module',
     '@nuxt/content',
     '@pinia/nuxt',
     (_options, nuxt) => {
@@ -20,7 +19,7 @@ export default defineNuxtConfig({
     }
     // ...
   ],
-  srcDir: 'src/',
+  srcDir: './src/',
   components: {
     dirs: []
   },
@@ -42,7 +41,10 @@ export default defineNuxtConfig({
     },
     redis: {
       host: process.env.REDIS_HOST,
-      port: process.env.REDIS_PORT
+      port: process.env.REDIS_PORT,
+      username: process.env.REDIS_USERNAME,
+      password: process.env.REDIS_PASSWORD,
+      db: process.env.REDIS_DB
     }
   }
 });

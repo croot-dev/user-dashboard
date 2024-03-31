@@ -8,5 +8,5 @@ export default defineNitroPlugin(() => {
   });
 
   // Mount driver
-  storage.mount('fs', driver);
+  // storage.mount('fs', driver);
 });

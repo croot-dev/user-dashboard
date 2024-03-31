@@ -2,6 +2,10 @@
   "name": "nuxt-app",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=18.9.0"
+  },
+  "packageManager": "yarn@1.22.19",
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
@@ -11,10 +15,6 @@
     "lint": "eslint \"**/*.{ts,tsx,vue,js}\" --fix",
     "lint-eslint": "eslint --ignore-path .gitignore **/*.{ts,vue} --fix"
   },
-  "engines": {
-    "node": ">=18.9.0"
-  },
-  "packageManager": "yarn@1.22.19",
   "devDependencies": {
     "@babel/eslint-parser": "^7.23.3",
     "@nabla/vite-plugin-eslint": "^2.0.2",
