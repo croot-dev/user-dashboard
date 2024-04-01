@@ -20,7 +20,12 @@ module.exports = {
   ignorePatterns: ['.eslintrc.cjs'],
   settings: {
     'import/resolver': {
-      typescript: {}
+      typescript: {
+        paths: ['src']
+      },
+      node: {
+        paths: ['src']
+      }
     },
     'import/parsers': {
       '@typescript-eslint/parser': ['.ts', '.tsx']
