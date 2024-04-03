@@ -3,12 +3,12 @@
     <v-form validate-on="submit lazy" @submit.prevent="submit">
       <v-text-field
         v-model="formData.userName"
-        :rules="[value => checkApi(value)]"
+        :rules="[]"
         label="아이디"
       />
       <v-text-field
         v-model="formData.password"
-        :rules="[value => checkApi(value)]"
+        :rules="[]"
         label="비밀번호"
       />
 
@@ -24,6 +24,11 @@
 </template>
 
 <script setup lang="ts">
+import { PROVIDE_KEY } from '~/constants';
+import type { API } from '~/types';
+import type { ToastProviderProps } from '~/providers/ToastProvider.vue';
+
+const toast = inject<ToastProviderProps>(PROVIDE_KEY.TOAST) as ToastProviderProps;
 const loading = ref(false);
 const timeout = ref(null);
 const formData = reactive({
@@ -31,29 +36,21 @@ const formData = reactive({
   password: ''
 });
 
-const submit = async (event) => {
+const submit = async () => {
   loading.value = true;
 
   try {
-    const { data }: API.DashboardDetailResponse = await useFetch('/api/user/signIn', { method: 'POST', body: JSON.stringify(formData) });
-    console.log(data);
+    const { data } = await useFetch<API.DashboardDetailResponse>('/api/user/signIn', { method: 'POST', body: JSON.stringify(formData) });
+    if (data.value?.statusCode === 200) {
+      // TODO:: save data.value.body to localStorage
+      navigateTo('/main');
+    } else if (data.value?.error) {
+      throw new Error(data.value.error.message);
+    }
   } catch (error: any) {
     toast.show({ message: error.message });
   } finally {
     loading.value = false;
   }
-};
-
-const checkApi = (userName) => {
-  return new Promise((resolve) => {
-    clearTimeout(timeout.value);
-
-    timeout.value = setTimeout(() => {
-      if (!userName) { return resolve('Please enter a user name.'); };
-      if (userName === 'johnleider') { return resolve('User name already taken. Please try another one.'); };
-
-      return resolve(true);
-    }, 1000);
-  });
 };
 </script>
