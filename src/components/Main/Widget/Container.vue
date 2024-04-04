@@ -73,10 +73,10 @@ const toast = inject<ToastProviderProps>(PROVIDE_KEY.TOAST) || { show: () => {} 
 
 // set widget component
 const getWidgetComponent = (typeCode: Widget.Type): AsyncComponentLoader => {
-  return defineAsyncComponent(() => import(`~/components/Widget/Type/${typeCode}.vue`)
+  return defineAsyncComponent(() => import(`./Type/${typeCode}.vue`)
     .catch((error) => {
       console.log(error.message);
-      return import('~/components/Main/Widget/Type/Empty.vue');
+      return import('./Type/Empty.vue');
     }));
 };
 const component = computed(() => getWidgetComponent(props.data.type));

@@ -1,4 +1,5 @@
 import type { Tab } from './tab';
+import type { UserInfo } from './user';
 
 interface ErrorObject extends Error {
     errorCode: string;
@@ -14,5 +15,7 @@ interface Response<BodyType> {
     error?: ErrorObject;
 }
 export namespace API {
+    export interface SignInResponse extends Response<UserInfo> {}
     export interface DashboardDetailResponse extends Response<Tab.Item> {}
+    export interface DashboardListResponse extends Response<Tab.Item[]> {}
 }

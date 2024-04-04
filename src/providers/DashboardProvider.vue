@@ -14,10 +14,12 @@ const props = defineProps<{widgets: Widget.Item[]}>();
 const emits = defineEmits<{
   'update:layout': [Tab.Item]
 }>();
+const { storage } = useStorage();
 const { convertToLayoutItem } = useWidgetParser();
 const toast = inject<ToastProviderProps>(PROVIDE_KEY.TOAST) || { show: () => {} };
 const widgets = ref<Widget.Item[]>(props.widgets || []);
 const layout = ref<ExpandLayoutItem[]>([]);
+const accessToken = storage.getItem('accessToken');
 
 /**
  * 레이아웃을 초기화합니다.
@@ -34,10 +36,17 @@ const resetLayout = () => {
  */
 const updateLayout = async (dashboardId: Tab.Id, body: Partial<Tab.Item>): Promise<Ref<Tab.Item> | void> => {
   try {
-    const { data }: API.DashboardDetailResponse = await useLazyFetch(`/api/dashboard/${dashboardId}`, { method: 'PATCH', body: JSON.stringify(body) });
-    if (Array.isArray(data.value.widgets)) {
-      widgets.value = data.value.widgets;
-      emits('update:layout', data.value);
+    const { data } = await useLazyFetch<API.DashboardDetailResponse>(
+      `/api/dashboard/${dashboardId}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(body),
+        headers: { Authorization: `Bearer ${accessToken}` }
+      }
+    );
+    if (Array.isArray(data.value?.body?.widgets)) {
+      widgets.value = data.value.body.widgets;
+      emits('update:layout', data.value.body);
       resetLayout();
     }
   } catch (error: any) {
@@ -81,12 +90,19 @@ const removeItem = (id: Widget.Id) => {
  */
 const updateWidget = async <WidgetType, >(tabId: Tab.Id, widgetId: Widget.Id, body: Partial<Widget.Item<WidgetType>>): Promise<Tab.Item | void> => {
   try {
-    const { data }: API.DashboardDetailResponse = await useFetch(`/api/dashboard/${tabId}/widget/${widgetId}`, { method: 'PATCH', body: JSON.stringify(body) });
-    if (data.value) {
-      widgets.value = data.value.widgets;
+    const { data } = await useFetch<API.DashboardDetailResponse>(
+      `/api/dashboard/${tabId}/widget/${widgetId}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(body),
+        headers: { Authorization: `Bearer ${accessToken}` }
+      }
+    );
+    if (data.value?.body) {
+      widgets.value = data.value.body.widgets;
       resetLayout();
+      return data.value.body;
     }
-    return data.value;
   } catch (error: any) {
     toast.show({ message: error.message });
   }

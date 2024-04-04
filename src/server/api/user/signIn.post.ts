@@ -1,6 +1,7 @@
 import { Response, ErrorResponse, STATUS_CODES } from '~/server/util/Response';
+import { getHash, generateToken } from '~/server/util/token';
 
-interface UserInfo {
+export interface UserInfo {
   userName: string;
   userHash: string;
   createdAt: string;
@@ -15,14 +16,16 @@ export default defineEventHandler(async (event) => {
       errorCode: 'undefined'
     }, STATUS_CODES.BAD_REQUEST);
   }
-  const userKey = `${userName}`;
-  const userHash = `${password}${password}`;
+  const userKey = `${userName.trim()}`;
+  const userHash = getHash(`${userName}${password}`);
 
-  const storage = useStorage('redis');
+  const storage = useStorage('user');
   const isSignedIn = await storage.hasItem(userKey);
+  let userInfo: UserInfo;
+
   // 기존 사용자
   if (isSignedIn) {
-    let userInfo = await storage.getItem<UserInfo>(userKey) as UserInfo;
+    userInfo = await storage.getItem<UserInfo>(userKey) as UserInfo;
 
     // Password Validation
     if (userInfo.userHash !== userHash) {
@@ -36,16 +39,21 @@ export default defineEventHandler(async (event) => {
       ...userInfo,
       lastLoginAt: (new Date()).toISOString()
     };
-    await storage.setItem<UserInfo>(userKey, userInfo);
-    return new Response<UserInfo>(userInfo);
   } else {
   // 신규 사용자
-    const userInfo = {
+    userInfo = {
       userName,
       userHash,
       createdAt: (new Date()).toISOString()
     };
-    await storage.setItem(userKey, JSON.stringify(userInfo));
-    return new Response<UserInfo>(userInfo);
   }
+
+  console.log(userInfo);
+  await storage.setItem<UserInfo>(userKey, userInfo);
+
+  const token = generateToken(userInfo);
+  return new Response<UserInfo & {token: string}>({
+    ...userInfo,
+    token
+  });
 });

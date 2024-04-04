@@ -51,20 +51,25 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { Tab } from '~/types';
+import type { API, Tab } from '~/types';
 import DashboardContainer from '~/components/Main/Dashboard/Container.vue';
 import DashboardProvider from '~/providers/DashboardProvider.vue';
 import RemoveDialogButton from './RemoveDialogButton.vue';
+
+const { storage } = useStorage();
+const accessToken = storage.getItem('accessToken');
 
 // handle list data
 const tabList = ref<Tab.Item[]>([]);
 const currentTabIndex = ref<number|null>(null);
 const getDashboardList = async () => {
   try {
-    const { data } = await useFetch<Tab.Item[]>('/api/dashboard');
-    if (data.value) {
-      tabList.value = data.value;
-      if (data.value.length > 0) {
+    const { data } = await useFetch<API.DashboardListResponse>('/api/dashboard', {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+    if (data.value?.body) {
+      tabList.value = data.value.body;
+      if (tabList.value.length > 0) {
         currentTabIndex.value = 0;
       }
     }
@@ -75,9 +80,15 @@ const getDashboardList = async () => {
 getDashboardList();
 
 const onClickAddDashboard = async () => {
-  const { data } = await useFetch('/api/dashboard', { method: 'POST', body: JSON.stringify({ title: 'NewDashboard' }) });
-  tabList.value.push(data.value as Tab.Item);
-  currentTabIndex.value = tabList.value.length - 1;
+  const { data } = await useFetch<API.DashboardDetailResponse>('/api/dashboard', {
+    method: 'POST',
+    body: JSON.stringify({ title: 'NewDashboard' }),
+    headers: { Authorization: `Bearer ${accessToken}` }
+  });
+  if (data.value?.body) {
+    tabList.value.push(data.value.body);
+    currentTabIndex.value = tabList.value.length - 1;
+  }
 };
 
 </script>

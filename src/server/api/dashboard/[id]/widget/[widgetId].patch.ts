@@ -1,18 +1,18 @@
 import { Tab } from '~/types';
+import { Response, STATUS_CODES } from '~/server/util/Response';
+import { verifyToken } from '~/server/util/token';
 
 export default defineEventHandler(async (event) => {
-  const storage = useStorage('redis');
-  const dashboardId = getRouterParam(event, 'id');
-  if (!dashboardId) {
+  const token = event.headers.get('Authorization');
+  if (!token) {
     throw createError({
-      statusCode: 400,
-      statusMessage: 'unknown Dashboard ID'
+      statusCode: STATUS_CODES.UNAUTHORIZED,
+      statusMessage: 'Unauthorized'
     });
   }
 
-  const data = await storage.getItem<Tab.Item[]>('dashboard') || [];
-  const targetIndex = data.findIndex(item => item.id === dashboardId);
-  if (targetIndex < 0) {
+  const dashboardId = getRouterParam(event, 'id');
+  if (!dashboardId) {
     throw createError({
       statusCode: 400,
       statusMessage: 'unknown Dashboard ID'
@@ -27,12 +27,23 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  const storage = useStorage('dashboard');
+  const { userName } = verifyToken(token.split(' ')[1])!;
+  const data = await storage.getItem<Tab.Item[]>(userName) || [];
+  const targetIndex = data.findIndex(item => item.id === dashboardId);
+  if (targetIndex < 0) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'unknown Dashboard ID'
+    });
+  }
+
   const body = await readBody(event);
-  const origin = await storage.getItem<Tab.Item[]>('dashboard') || [];
+  const origin = await storage.getItem<Tab.Item[]>(userName) || [];
   const widgets = origin[targetIndex].widgets.map(widget => (widget.id !== widgetId) ? widget : Object.assign(widget, body));
   const updated = { ...origin[targetIndex], widgets };
   origin.splice(targetIndex, 1, updated);
-  await storage.setItem('dashboard', origin);
+  await storage.setItem(userName, origin);
 
-  return updated;
+  return new Response(updated);
 });
