@@ -14,6 +14,7 @@
             suffix="🕗 00:00:00"
             required
             hide-details
+            bg-color="#FFFFFF"
           />
         </v-col>
 
@@ -29,6 +30,7 @@
             required
             suffix="🕗 23:59:59"
             hide-details
+            bg-color="#FFFFFF"
           />
         </v-col>
 
@@ -39,7 +41,7 @@
           md="3"
         >
           <v-btn
-            color="primary"
+            color="#05A3F2"
             @click="submit"
           >
             <v-icon icon="mdi-magnify" />

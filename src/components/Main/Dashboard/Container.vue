@@ -1,86 +1,91 @@
 <template>
-  <v-row>
-    <v-col>
-      <DashboardContainerForm
-        :initial-data="tabData.globalSetting"
-        @update:value="onUpdateForm"
-      />
-    </v-col>
-  </v-row>
-  <v-row align="center">
-    <v-col>
-      Last Updated: {{ dayjs(lastUpdateTime).format('YYYY-MM-DD HH:mm:ss') }}
-      <v-btn
-        v-show="isEditMode === false"
-        variant="plain"
-        size="small"
-        icon="mdi-refresh-auto"
-        :color="autoReloadColor"
-        @click="onClickAutoReload"
-      />
-    </v-col>
-    <v-spacer />
-    <v-col class="d-flex">
-      <v-switch
-        v-model="isEditMode"
-        :label="isEditMode? 'edit' : 'read'"
-        hide-details
-        density="compact"
-        @update:model-value="onUpdateMode"
-      />
-      <v-checkbox
-        v-if="isEditMode"
-        v-model="isHideContent"
-        hide-details
-        density="compact"
-        label="hide content"
-      />
-      <template v-if="isEditMode">
-        <v-btn size="small" @click="onClickAdd">
-          Add
-        </v-btn>
-        <v-btn size="small" @click="onClickSave">
-          Save
-        </v-btn>
-      </template>
-    </v-col>
-  </v-row>
-
-  <GridLayout
-    v-model:layout="layout"
-    :col-num="4"
-    :max-rows="isEditMode ? Infinity : 4"
-    :row-height="240"
-    :is-draggable="isEditMode"
-    :is-resizable="isEditMode"
-    :responsive="false"
-  >
-    <GridItem
-      v-for="(item, key) in layout"
-      :key="key"
-      :static="item.static"
-      :x="item.x"
-      :y="item.y"
-      :w="item.w"
-      :h="item.h"
-      :i="item.i"
-      :min-w="1"
-      :min-h="1"
-      :max-w="4"
-      :max-h="2"
-      class="grid-item"
-    >
-      <WidgetContainer
-        :key="JSON.stringify({'mode': isEditMode, ...item})"
-        :tab-id="tabData.id"
-        :data="item.data"
-        :global-setting="tabData.globalSetting"
-        :hide-content="isEditMode && isHideContent"
-        :is-edit="isEditMode"
-        @remove-widget="handleRemoveWidget(item.i)"
-      />
-    </GridItem>
-  </GridLayout>
+  <div class="form-container">
+    <v-row style="background: #e9eCef">
+      <v-col>
+        <DashboardContainerForm
+          :initial-data="tabData.globalSetting"
+          @update:value="onUpdateForm"
+        />
+      </v-col>
+    </v-row>
+    <v-row align="center" style="padding: 0 20px">
+      <v-col>
+        Last Updated: {{ dayjs(lastUpdateTime).format('YYYY-MM-DD HH:mm:ss') }}
+        <v-btn
+          v-show="isEditMode === false"
+          variant="plain"
+          size="small"
+          icon="mdi-refresh-auto"
+          :color="autoReloadColor"
+          @click="onClickAutoReload"
+        />
+      </v-col>
+      <v-spacer />
+      <v-col class="d-flex">
+        <v-switch
+          v-model="isEditMode"
+          :label="isEditMode? 'edit' : 'read'"
+          hide-details
+          density="compact"
+          @update:model-value="onUpdateMode"
+        />
+        <v-checkbox
+          v-if="isEditMode"
+          v-model="isHideContent"
+          hide-details
+          density="compact"
+          label="hide content"
+        />
+        <template v-if="isEditMode">
+          <v-btn size="small" @click="onClickAdd">
+            Add
+          </v-btn>
+          <v-btn size="small" @click="onClickSave">
+            Save
+          </v-btn>
+        </template>
+      </v-col>
+    </v-row>
+  </div>
+  <div v-if="layout.length > 0" style="background-color: #F8F9Fa">
+    <div class="grid-container">
+      <GridLayout
+        v-model:layout="layout"
+        :col-num="4"
+        :max-rows="isEditMode ? Infinity : 4"
+        :row-height="240"
+        :is-draggable="isEditMode"
+        :is-resizable="isEditMode"
+        :responsive="false"
+      >
+        <GridItem
+          v-for="(item, key) in layout"
+          :key="key"
+          :static="item.static"
+          :x="item.x"
+          :y="item.y"
+          :w="item.w"
+          :h="item.h"
+          :i="item.i"
+          :min-w="1"
+          :min-h="1"
+          :max-w="4"
+          :max-h="2"
+          class="grid-item"
+        >
+          <WidgetContainer
+            :key="JSON.stringify({'mode': isEditMode, ...item})"
+            :tab-id="tabData.id"
+            :data="item.data"
+            :global-setting="tabData.globalSetting"
+            :hide-content="isEditMode && isHideContent"
+            :is-edit="isEditMode"
+            @remove-widget="handleRemoveWidget(item.i)"
+          />
+        </GridItem>
+      </GridLayout>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -173,6 +178,13 @@ const handleRemoveWidget = (id: Widget.Id) => {
 </script>
 
 <style lang="scss" scoped>
+.form-container {
+
+}
+.grid-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
 .grid-item {
   background-color: #fff;
 }

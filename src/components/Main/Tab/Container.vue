@@ -1,11 +1,15 @@
 <template>
   <div class="tab-wrapper">
-    <v-btn @click="onClickAddDashboard">
-      Add Dashboard
-    </v-btn>
+    <v-toolbar
+      color="#051923"
+    >
+      <v-toolbar-title>User Profile</v-toolbar-title>
+    </v-toolbar>
     <v-tabs
       v-model="currentTabIndex"
       show-arrows
+      bg-color="#003554"
+      style="padding-right:20px"
     >
       <v-tab
         v-for="(tabData, key) in tabList"
@@ -26,10 +30,18 @@
           />
         </template>
       </v-tab>
+      <div style="margin-left: auto; padding:4px">
+        <v-btn
+          icon="mdi-plus"
+          color="#05A3F2"
+          density="comfortable"
+          @click="onClickAddDashboard"
+        />
+      </div>
     </v-tabs>
   </div>
   <div class="content-wrapper">
-    <v-window v-model="currentTabIndex">
+    <v-window v-model="currentTabIndex" style="height: 100%">
       <v-window-item
         v-for="(tabData, tabIndex) in tabList"
         :key="tabData.id"
@@ -97,7 +109,6 @@ const onClickAddDashboard = async () => {
 .content-wrapper {
   overflow: auto;
   flex: 1 auto;
-  margin: 0 8px 8px;
-  background-color: #fefefe;
+  background-color: #FFFFFF;
 }
 </style>

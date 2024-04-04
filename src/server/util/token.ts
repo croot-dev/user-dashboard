@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { UserInfo } from '~/types/user';
+import { STATUS_CODES } from './Response';
 const secretKey: string = process.env.TOKEN_SECRET_KEY || 'user-dashboard-secret-key';
 
 export const generateToken = (userInfo: UserInfo) => {
@@ -28,7 +29,15 @@ export const refreshToken = (token: string) => {
 
 export const verifyToken = (token: string) => {
   if (!token) { return null; }
-  return jwt.verify(token, secretKey) as UserInfo;
+  return jwt.verify(token, secretKey, (error, decoded) => {
+    if (error) {
+      throw createError({
+        statusCode: STATUS_CODES.UNAUTHORIZED,
+        statusMessage: 'Unauthorized'
+      });
+    }
+    return decoded;
+  });
 };
 
 export const getHash = (payload: string) => {
