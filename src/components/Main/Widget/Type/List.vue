@@ -18,11 +18,12 @@ withDefaults(defineProps<{
   width: number;
   height: number;
   dataSource: typeof VDataTable['items']
-  content?: Widget.Content[typeof WIDGET_TYPE.LIST];
+  content?: Widget.Content[typeof WIDGET_TYPE.LIST] | void;
 }>(), {
   title: 'Undefined',
   width: 240,
-  height: 240
+  height: 240,
+  content: undefined
 });
 
 </script>

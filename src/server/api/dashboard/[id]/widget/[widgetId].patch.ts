@@ -39,11 +39,29 @@ export default defineEventHandler(async (event) => {
   }
 
   const body = await readBody(event);
-  const origin = await storage.getItem<Tab.Item[]>(userName) || [];
-  const widgets = origin[targetIndex].widgets.map(widget => (widget.id !== widgetId) ? widget : Object.assign(widget, body));
-  const updated = { ...origin[targetIndex], widgets };
-  origin.splice(targetIndex, 1, updated);
-  await storage.setItem(userName, origin);
+  const originDashboard = await storage.getItem<Tab.Item[]>(userName) || [];
+  const targetDashboard = originDashboard[targetIndex];
+  const originWidgetIdx = targetDashboard.widgets.findIndex(widget => (widget.id !== widgetId));
+  if (originWidgetIdx < 0) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'unknown Widget ID'
+    });
+  }
+  const widgets = targetDashboard.widgets.map((widget) => {
+    if (widget.id !== widgetId) {
+      return widget;
+    } else {
+      return {
+        ...widget,
+        ...body,
+        setting: body.setting
+      };
+    }
+  });
+  const updated = { ...targetDashboard, widgets };
+  originDashboard.splice(targetIndex, 1, updated);
+  await storage.setItem(userName, originDashboard);
 
   return new Response(updated);
 });

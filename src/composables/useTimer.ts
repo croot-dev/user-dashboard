@@ -10,7 +10,7 @@ type TimerID = ReturnType<typeof setTimeout>;
  * @returns 타이머 관련 기능을 제공하는 객체
  */
 export const useTimer = (
-  callback: () => Promise<any> | void = () => { },
+  callback: () => Promise<boolean> | boolean,
   delay: number = 10 * 100
 ) => {
   const timerId = shallowRef<TimerID>(0 as unknown as TimerID);
@@ -21,6 +21,7 @@ export const useTimer = (
    * @returns 타이머 식별자
    */
   const start = (): TimerID => {
+    clearTimeout(timerId.value);
     const reloader = () => {
       isRunning.value = true;
       timerId.value = setTimeout(async () => {
@@ -60,7 +61,7 @@ export const useTimer = (
 
   return {
     timerId: readonly(unref(timerId)), // 읽기 전용 타이머 식별자
-    isRunning: readonly(toRaw(isRunning)), // 읽기 전용 isRunning 상태
+    isRunning: readonly(isRunning), // 읽기 전용 isRunning 상태
     toggle, // 타이머 토글 함수
     start, // 타이머 시작 함수
     stop // 타이머 중지 함수

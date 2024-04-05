@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+import { FORMAT } from '~/constants';
 import { Tab } from '~/types';
 import { generateKey } from '~/utils';
 import { Response, STATUS_CODES } from '~/server/util/Response';
@@ -29,7 +31,14 @@ export default defineEventHandler(async (event) => {
   const newDashboard: Tab.Item = Object.assign(
     {},
     DASHBOARD_TEMPLATE,
-    { id: generateKey(5), title: body.title || 'Noname' }
+    {
+      id: generateKey(5),
+      title: body.title || 'Noname',
+      globalSetting: {
+        startDate: dayjs().subtract(1, 'month').format(FORMAT.DATE),
+        endDate: dayjs().format(FORMAT.DATE)
+      }
+    }
   );
   const origin: Tab.Item[] = await storage.getItem<Tab.Item[]>(userName) || [];
   origin.push(newDashboard);

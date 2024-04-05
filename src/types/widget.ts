@@ -1,4 +1,5 @@
-import { DATA_SOURCE_TYPE, WIDGET_TYPE } from '../constants';
+import type { ValueOf } from '.';
+import { DATA_SOURCE_TYPE, WIDGET_TYPE, WIDGET_INDICATOR_CALCULATOR } from '../constants';
 export namespace Widget {
     export type Id = string;
 
@@ -11,9 +12,8 @@ export namespace Widget {
 
     export interface Content {
         [WIDGET_TYPE.INDICATOR]: {
-            maintext: string;
-            caption?: string;
-            imagesrc?: string;
+            column: string;
+            calculator: ValueOf<typeof WIDGET_INDICATOR_CALCULATOR>
         };
         [WIDGET_TYPE.LIST]: {};
         [WIDGET_TYPE.RANK]: {};
@@ -43,5 +43,4 @@ export namespace Widget {
         setting?: Setting;
         content?: T
     }
-
 }

@@ -26,12 +26,12 @@
     <div class="widget-option">
       <v-btn-group>
         <WidgetSettingForm
+          v-if="!isEdit"
           :model-value="{
             title: $props.data.title,
             type: $props.data.type,
             dataSourceType: $props.data.dataSourceType,
             ...($props.data.content && { content: $props.data.content }),
-            useLocalSetting,
             ...(useLocalSetting && { ...props.data.setting })
           }"
           @update:setting="handleUpdateSetting"
@@ -68,7 +68,7 @@ const props = withDefaults(defineProps<WidgetContainerProps>(), {
 const emits = defineEmits<{
   'remove-widget': [Widget.Id]
 }>();
-const { updateWidget } = inject<DashboardProvider>(PROVIDE_KEY.DASHBOARD) as DashboardProvider;
+const { updateWidget } = inject<DashboardProvider>(PROVIDE_KEY.DASHBOARD)!;
 const toast = inject<ToastProviderProps>(PROVIDE_KEY.TOAST) || { show: () => {} };
 
 // set widget component
@@ -120,12 +120,12 @@ const handleUpdateSetting = (settingData: any) => {
     title: settingData.title || props.data.title,
     dataSourceType: settingData.dataSourceType,
     content: settingData.content,
-    ...(settingData.useLocalSetting && {
-      setting: {
+    setting: settingData.useLocalSetting
+      ? {
         startDate: settingData.startDate || '',
         endDate: settingData.endDate || ''
       }
-    })
+      : undefined
   };
   updateWidget(props.tabId, props.data.id, body)
     .then(() => {

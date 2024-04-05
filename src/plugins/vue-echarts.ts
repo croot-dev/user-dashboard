@@ -1,7 +1,8 @@
 import {
   LineChart,
   PieChart,
-  BarChart
+  BarChart,
+  ScatterChart
 } from 'echarts/charts';
 import {
   TitleComponent,
@@ -19,6 +20,7 @@ export default defineNuxtPlugin((app) => {
     LineChart,
     BarChart,
     PieChart,
+    ScatterChart,
     GridComponent,
     TitleComponent,
     TooltipComponent,

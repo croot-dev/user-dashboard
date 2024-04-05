@@ -41,12 +41,15 @@
           md="3"
         >
           <v-btn
+            size="large"
             color="#05A3F2"
             @click="submit"
           >
             <v-icon icon="mdi-magnify" />
           </v-btn>
           <v-btn
+            size="large"
+            style="margin-left: 10px"
             @click="resetConditionValues"
           >
             <v-icon icon="mdi-eraser" />
@@ -60,6 +63,7 @@
 <script setup lang="ts">
 import dayjs from 'dayjs';
 import { reactive } from 'vue';
+import { FORMAT } from '~/constants';
 
 import type { Tab, Widget } from '~/types';
 
@@ -70,18 +74,16 @@ interface FormData {
 interface Props {
   initialData: FormData
 }
-const DATE_FORMAT = 'YYYY-MM-DD';
 const props = withDefaults(
   defineProps<Props>(),
   {
     initialData: () => ({
-      startDate: dayjs().subtract(1, 'month').format(DATE_FORMAT),
-      endDate: dayjs().format(DATE_FORMAT)
+      startDate: dayjs().subtract(1, 'month').format(FORMAT.DATE),
+      endDate: dayjs().format(FORMAT.DATE)
     })
   }
 );
 const emits = defineEmits(['update:value']);
-
 const conditionValues = reactive<FormData>({
   startDate: props.initialData.startDate,
   endDate: props.initialData.endDate

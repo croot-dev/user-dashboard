@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { CODE, PROVIDE_KEY } from '~/constants';
+import { PROVIDE_KEY } from '~/constants';
 import type { Tab, Widget, API } from '~/types';
 import { useTemplate } from '~/composables/useTemplate';
 import { useWidgetParser, type ExpandLayoutItem } from '~/composables/useWidgetParser';

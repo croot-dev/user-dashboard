@@ -26,7 +26,7 @@
           variant="text"
           @click="onClickRemoveDashboard"
         >
-          Save
+          Confirm
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -42,11 +42,19 @@ const { tabId, successCallback } = defineProps<{
   successCallback:() => void
 }>();
 
+const { storage } = useStorage();
+const accessToken = storage.getItem('accessToken');
 const toast = inject<ToastProviderProps>(PROVIDE_KEY.TOAST) as ToastProviderProps;
 const dialog = ref(false);
 const onClickRemoveDashboard = async () => {
   try {
-    await useFetch(`/api/dashboard/${tabId}`, { method: 'DELETE' });
+    await useFetch(
+      `/api/dashboard/${tabId}`,
+      {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${accessToken}` }
+      }
+    );
     (typeof successCallback === 'function') && successCallback();
   } catch (error: any) {
     console.log(error);

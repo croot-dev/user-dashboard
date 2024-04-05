@@ -1,10 +1,10 @@
 <template>
   <div class="tab-wrapper">
-    <v-toolbar
+    <!-- <v-toolbar
       color="#051923"
     >
-      <v-toolbar-title>User Profile</v-toolbar-title>
-    </v-toolbar>
+      <v-toolbar-title>User Dashboard</v-toolbar-title>
+    </v-toolbar> -->
     <v-tabs
       v-model="currentTabIndex"
       show-arrows
@@ -41,7 +41,7 @@
     </v-tabs>
   </div>
   <div class="content-wrapper">
-    <v-window v-model="currentTabIndex" style="height: 100%">
+    <v-window v-model="currentTabIndex">
       <v-window-item
         v-for="(tabData, tabIndex) in tabList"
         :key="tabData.id"
@@ -63,6 +63,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { ROUTE } from '~/constants';
 import type { API, Tab } from '~/types';
 import DashboardContainer from '~/components/Main/Dashboard/Container.vue';
 import DashboardProvider from '~/providers/DashboardProvider.vue';
@@ -76,9 +77,12 @@ const tabList = ref<Tab.Item[]>([]);
 const currentTabIndex = ref<number|null>(null);
 const getDashboardList = async () => {
   try {
-    const { data } = await useFetch<API.DashboardListResponse>('/api/dashboard', {
+    const { data, error } = await useFetch<API.DashboardListResponse>('/api/dashboard', {
       headers: { Authorization: `Bearer ${accessToken}` }
     });
+    if (error.value) {
+      throw toRaw(error.value);
+    }
     if (data.value?.body) {
       tabList.value = data.value.body;
       if (tabList.value.length > 0) {
@@ -86,7 +90,9 @@ const getDashboardList = async () => {
       }
     }
   } catch (error) {
-    // console.log(error);
+    if (error?.statusCode === 401) {
+      navigateTo(ROUTE.SIGNIN);
+    }
   }
 };
 getDashboardList();
@@ -109,6 +115,6 @@ const onClickAddDashboard = async () => {
 .content-wrapper {
   overflow: auto;
   flex: 1 auto;
-  background-color: #FFFFFF;
+  background-color: #e9eCef;
 }
 </style>

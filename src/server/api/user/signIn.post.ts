@@ -48,7 +48,6 @@ export default defineEventHandler(async (event) => {
     };
   }
 
-  console.log(userInfo);
   await storage.setItem<UserInfo>(userKey, userInfo);
 
   const token = generateToken(userInfo);

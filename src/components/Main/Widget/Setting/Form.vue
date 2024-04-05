@@ -64,6 +64,7 @@
                 label="기간 개별 설정"
                 density="compact"
                 hide-details
+                @update:model-value="onUpdateLocalSetting"
               />
             </v-row>
             <v-row v-if="form.useLocalSetting" no-gutters>
@@ -151,21 +152,31 @@ const customFormField = computed(() => {
   switch (form.type) {
   case WIDGET_TYPE.BAR:
   case WIDGET_TYPE.LINE:
+    return defineAsyncComponent(() => import('./MultiAxisChartFields.vue'));
+  case WIDGET_TYPE.SCATTER:
     return defineAsyncComponent(() => import('./AxisChartFields.vue'));
+  case WIDGET_TYPE.INDICATOR:
+    return defineAsyncComponent(() => import('./IndicatorFields.vue'));
   case WIDGET_TYPE.PIE:
     return defineAsyncComponent(() => import('./PieChartFields.vue'));
-  case WIDGET_TYPE.SCATTER:
   default:
     return {};
   }
 });
 
-const onUpdateType = (widgetType: Widget.Type) => {
+const onUpdateType = (_widgetType: Widget.Type) => {
   form.content = {};
 };
 
 const onUpdateCustomField = (customFields: Widget.Content[typeof form.type]) => {
   form.content = customFields;
+};
+
+const onUpdateLocalSetting = (isUse: boolean | null) => {
+  if (isUse !== true) {
+    delete form.startDate;
+    delete form.endDate;
+  }
 };
 
 const onClickEdit = () => {

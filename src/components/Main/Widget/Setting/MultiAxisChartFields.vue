@@ -13,12 +13,13 @@
     </v-col>
     <v-col>
       <v-select
-        v-model="(form.yAxis as string)"
+        v-model="form.yAxis"
         :items="dataLabels.filter(item => item !== form.xAxis)"
         label="yAxis"
         density="compact"
         required
         hide-details
+        multiple
         clearable
         @update:model-value="onUpdateForm"
       />
@@ -33,7 +34,7 @@ import { useDatasetStore } from '~/stores/dataset';
 
 export interface AxisFormItems {
   xAxis: string | void;
-  yAxis: string | void;
+  yAxis: string[];
 }
 
 interface Props {
@@ -49,7 +50,7 @@ const emits = defineEmits<{
 
 const form = reactive<AxisFormItems>({
   xAxis: props.modelValue?.xAxis,
-  yAxis: props.modelValue?.yAxis
+  yAxis: props.modelValue?.yAxis || []
 });
 
 const dataset = useDatasetStore();
@@ -66,7 +67,7 @@ const setDataLabels = async () => {
 setDataLabels();
 watch(() => props.dataSourceType, () => {
   form.xAxis = undefined;
-  form.yAxis = undefined;
+  form.yAxis = [];
   setDataLabels();
 });
 

@@ -6,6 +6,10 @@ export const CODE = {
   WIDGET: 'widget'
 } as const;
 
+export const FORMAT = {
+  DATE: 'YYYY-MM-DD'
+} as const;
+
 /**
  * Provide ID
  */
@@ -27,6 +31,13 @@ export const WIDGET_TYPE = {
   SCATTER: 'Scatter'
 } as const;
 
+export const WIDGET_INDICATOR_CALCULATOR = {
+  SUM: 'SUM',
+  AVG: 'AVG',
+  COUNT: 'COUNT',
+  MIN: 'MIN',
+  MAX: 'MAX'
+} as const;
 /**
  * 통계 데이터 유형
  */
@@ -34,3 +45,5 @@ export const DATA_SOURCE_TYPE = {
   EMPTY: '',
   WEALTH_BY_AGE_GROUP: 'WealthByAgeGroup'
 } as const;
+
+export * from './route';

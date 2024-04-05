@@ -5,6 +5,10 @@
 </template>
 <script setup lang="ts">
 import TabContainer from '~/components/Main/Tab/Container.vue';
+
+definePageMeta({
+  middleware: 'auth'
+});
 </script>
   <style lang="scss" scoped>
   :global(body) {

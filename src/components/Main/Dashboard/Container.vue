@@ -1,6 +1,6 @@
 <template>
   <div class="form-container">
-    <v-row style="background: #e9eCef">
+    <v-row>
       <v-col>
         <DashboardContainerForm
           :initial-data="tabData.globalSetting"
@@ -21,13 +21,13 @@
         />
       </v-col>
       <v-spacer />
-      <v-col class="d-flex">
+      <v-col class="d-flex" align-self="center">
         <v-switch
           v-model="isEditMode"
           :label="isEditMode? 'edit' : 'read'"
           hide-details
           density="compact"
-          @update:model-value="onUpdateMode"
+          @update:model-value="onModeUpdated"
         />
         <v-checkbox
           v-if="isEditMode"
@@ -37,17 +37,18 @@
           label="hide content"
         />
         <template v-if="isEditMode">
-          <v-btn size="small" @click="onClickAdd">
+          <v-spacer />
+          <v-btn size="small" class="mt-1" @click="onClickAdd">
             Add
           </v-btn>
-          <v-btn size="small" @click="onClickSave">
+          <v-btn size="small" class="ml-2 mt-1" color="#051923" @click="onClickSave">
             Save
           </v-btn>
         </template>
       </v-col>
     </v-row>
   </div>
-  <div v-if="layout.length > 0" style="background-color: #F8F9Fa">
+  <div v-if="layout.length > 0" style="background-color: #e9eCef">
     <div class="grid-container">
       <GridLayout
         v-model:layout="layout"
@@ -104,32 +105,40 @@ interface Props {
   tabData: Tab.Item;
 }
 const props = defineProps<Props>();
-const toast = inject<ToastProviderProps>(PROVIDE_KEY.TOAST) as ToastProviderProps;
 
-// handle layout data
-const lastUpdateTime = ref(new Date().toISOString());
+const { convertToWidgetItem } = useWidgetParser();
+const updatedTimer = useTimer(() => {
+  lastUpdateTime.value = new Date().toISOString();
+  return !isEditMode.value;
+}, 10 * 100);
+
+const toast = inject<ToastProviderProps>(PROVIDE_KEY.TOAST)!;
 const {
   layout,
   resetLayout,
   updateLayout,
   addItem: addLayoutItem,
   removeItem: removeLayoutItem
-} = inject<DashboardProvider>(PROVIDE_KEY.DASHBOARD) as DashboardProvider;
-const {
-  convertToWidgetItem
-} = useWidgetParser();
+} = inject<DashboardProvider>(PROVIDE_KEY.DASHBOARD)!;
+
+const isEditMode = ref(false); // 수정 모드 유무
+const isHideContent = ref(true); // 컨텐츠 표시 유무
+const lastUpdateTime = ref(new Date().toISOString()); // 최근 조회 시간
+const autoReloadColor = computed(() => (updatedTimer.isRunning.value) ? '#05a3f2' : '');
+
+/**
+ * 대시보드 초기화
+ */
 const reset = () => {
   resetLayout();
   lastUpdateTime.value = new Date().toISOString();
 };
-// const dataset = useDatasetStore();
-// watch(() => dataset.initialized, (loaded) => { (loaded) && reset(); }, { immediate: true });
 
-// handle mode
-const isEditMode = ref(false);
-const isHideContent = ref(true);
-const onUpdateMode = (value: boolean | null) => {
-  if (value) {
+/**
+ * 대시보드 모드 변경 핸들러
+ */
+const onModeUpdated = (isEditing: boolean | null) => {
+  if (isEditing === true) {
     if (updatedTimer.isRunning.value) {
       updatedTimer.stop();
     }
@@ -138,18 +147,19 @@ const onUpdateMode = (value: boolean | null) => {
   }
 };
 
-// handle auto reload
-const updatedTimer = useTimer(() => {
-  lastUpdateTime.value = new Date().toISOString();
-}, 10 * 100);
-const autoReloadColor = computed(() => (updatedTimer.isRunning.value) ? 'primary' : '');
+/**
+ * 자동 새로고침 핸들러
+ */
 const onClickAutoReload = () => {
   if (!isEditMode.value) {
     updatedTimer.toggle();
   }
 };
 
-// handle form
+/**
+ * 대시보드 설정 업데이트
+ * @param globalSetting 대시보드 공통 설정
+ */
 const onUpdateForm = (globalSetting: Tab.GlobalSetting) => {
   updateLayout(props.tabData.id, { globalSetting })
     .then(() => {
@@ -158,6 +168,16 @@ const onUpdateForm = (globalSetting: Tab.GlobalSetting) => {
     });
 };
 
+/**
+ * 위젯 삭제 핸들러
+ */
+const handleRemoveWidget = (id: Widget.Id) => {
+  removeLayoutItem(id);
+};
+
+/**
+ * 대시보드 위젯 업데이트
+ */
 const onClickSave = () => {
   const widgets = layout.value.map(widget => convertToWidgetItem(widget));
   updateLayout(props.tabData.id, { widgets })
@@ -167,19 +187,25 @@ const onClickSave = () => {
     });
 };
 
+/**
+ * 위젯 추가 이벤트 핸들러
+ */
 const onClickAdd = () => {
+  isEditMode.value = false;
   addLayoutItem();
-};
 
-const handleRemoveWidget = (id: Widget.Id) => {
-  removeLayoutItem(id);
+  // 추가된 위젯이 이동이 되지 않아 임의로 EditMode를 변환하여 해결.
+  nextTick(() => {
+    isEditMode.value = true;
+  });
 };
 
 </script>
 
 <style lang="scss" scoped>
 .form-container {
-
+  max-width: 1200px;
+  margin: 0 auto;
 }
 .grid-container {
   max-width: 1200px;

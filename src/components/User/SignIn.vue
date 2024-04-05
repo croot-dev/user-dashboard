@@ -31,7 +31,6 @@ import type { ToastProviderProps } from '~/providers/ToastProvider.vue';
 const { storage } = useStorage();
 const toast = inject<ToastProviderProps>(PROVIDE_KEY.TOAST) as ToastProviderProps;
 const loading = ref(false);
-const timeout = ref(null);
 const formData = reactive({
   userName: '',
   password: ''
