@@ -10,7 +10,14 @@
 1. `.env` 환경설정 파일 생성 
     ```yaml
     # ~/.env
-    FS_BASE = "./server/db"
+    TOKEN_SECRET_KEY=
+    STORAGE_SECRET_KEY=
+    REDIS_HOST=
+    REDIS_PORT=
+    REDIS_USERNAME=
+    REDIS_PASSWORD=
+    REDIS_DB=
+    FS_BASE=
     ```
 1. 로컬 서버 실행
     ```bash
@@ -34,7 +41,7 @@
 - 위젯 차트 세부설정 변경
 - 위젯 개별 조회일자 설정
 
-## 컴토넌트 구조
+## 컴포넌트 구조
 ![component structure](image.png)
 
 
@@ -98,10 +105,12 @@ setTimeout 기반 타이머 선언
 | addItem | `(Partial<ExpandLayoutItem>) => void` | layout 아이템 추가 |
 | removeItem | `(Widget.Id) => void` | layout 아이템 제거 |
 
-#### ToastProvider
-토스트(snackbar) 메시지 호출 Provider
-**Props**
--  
+#### ToastProvider  
+토스트(snackbar) 메시지 호출 Provider  
+
+**Props**  
+Empty.
+
 **Inject**  
 | Name | Type | Desc |
 |---|---|---|
@@ -109,9 +118,10 @@ setTimeout 기반 타이머 선언
 | hide | `() => void` | 토스트 메시지 제거 |
 
 
-### Stores
-#### dataset.ts
-외부 데이터 처리 담당
+### Stores  
+#### dataset.ts  
+외부 데이터 처리 담당  
+
 
 ## Epilogue
 예전에 진행 했던 프로젝트 중 하나로 Vue3/Nuxt3 익힐 겸 다시 해보았으니 역시나 복잡한 구조로 꽤나 고생을 했다.  
@@ -123,4 +133,4 @@ setTimeout 기반 타이머 선언
   - 타입스크립트 작성을 체계적으로 하지 못한 점.
 - Try:
   - 차트 부분을 D3 등을 통해 직접 만들고 싶었지만 너무 커져버리는 스케일로 추후 개선.
-  - 로컬 환경에서 가끔 메모리가 넘치는 경우가 있는데, 노트북 문제인지 뭔지 알아 볼 것.
+  - ~~로컬 환경에서 가끔 메모리가 넘치는 경우가 있는데, 노트북 문제인지 뭔지 알아 볼 것.~~

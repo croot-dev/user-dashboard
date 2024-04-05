@@ -7,6 +7,7 @@
     <v-card-item
       :title="$props.data.title"
       :subtitle="subtitle"
+      :class="(useLocalSetting && 'mark-subtitle')"
     >
       <v-skeleton-loader
         v-if="hideContent"
@@ -154,6 +155,10 @@ const handleUpdateSetting = (settingData: any) => {
     top: 0;
     right: 0;
     opacity: 0;
+  }
+
+  :global(.widget-box .mark-subtitle .v-card-subtitle) {
+    color: #f54600;
   }
 }
 </style>
