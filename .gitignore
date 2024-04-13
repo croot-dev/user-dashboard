@@ -24,3 +24,7 @@ logs
 !.env.example
 
 server/db
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

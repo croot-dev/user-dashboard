@@ -14,7 +14,7 @@ import {
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 
-export default defineNuxtPlugin((app) => {
+export default defineNuxtPlugin(() => {
   use([
     CanvasRenderer,
     LineChart,

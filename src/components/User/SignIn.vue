@@ -5,11 +5,13 @@
         v-model="formData.userName"
         :rules="[]"
         label="아이디"
+        name="username"
       />
       <v-text-field
         v-model="formData.password"
         :rules="[]"
         label="비밀번호"
+        name="password"
       />
 
       <v-btn

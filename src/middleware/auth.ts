@@ -1,6 +1,6 @@
 import { ROUTE } from '~/constants';
 
-export default defineNuxtRouteMiddleware((to, from) => {
+export default defineNuxtRouteMiddleware(() => {
   const { storage } = useStorage();
   const accessToken = storage.getItem('accessToken');
   if (!accessToken) {
