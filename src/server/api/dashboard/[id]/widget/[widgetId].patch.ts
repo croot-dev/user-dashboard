@@ -41,13 +41,14 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event);
   const originDashboard = await storage.getItem<Tab.Item[]>(userName) || [];
   const targetDashboard = originDashboard[targetIndex];
-  const originWidgetIdx = targetDashboard.widgets.findIndex(widget => (widget.id !== widgetId));
+  const originWidgetIdx = targetDashboard.widgets.findIndex(widget => (widget.id === widgetId));
   if (originWidgetIdx < 0) {
     throw createError({
       statusCode: 400,
       statusMessage: 'unknown Widget ID'
     });
   }
+
   const widgets = targetDashboard.widgets.map((widget) => {
     if (widget.id !== widgetId) {
       return widget;

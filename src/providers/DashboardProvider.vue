@@ -89,22 +89,21 @@ const removeItem = (id: Widget.Id) => {
  * @returns {Promise<Tab.Item | void>} 업데이트된 데이터 또는 void
  */
 const updateWidget = async <WidgetType, >(tabId: Tab.Id, widgetId: Widget.Id, body: Partial<Widget.Item<WidgetType>>): Promise<Tab.Item | void> => {
-  try {
-    const { data } = await useFetch<API.DashboardDetailResponse>(
-      `/api/dashboard/${tabId}/widget/${widgetId}`,
-      {
-        method: 'PATCH',
-        body: JSON.stringify(body),
-        headers: { Authorization: `Bearer ${accessToken}` }
-      }
-    );
-    if (data.value?.body) {
-      widgets.value = data.value.body.widgets;
-      resetLayout();
-      return data.value.body;
+  const { data, error } = await useFetch<API.DashboardDetailResponse>(
+    `/api/dashboard/${tabId}/widget/${widgetId}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+      headers: { Authorization: `Bearer ${accessToken}` }
     }
-  } catch (error: any) {
-    toast.show({ message: error.message });
+  );
+  if (error.value) {
+    throw toRaw(error.value);
+  }
+  if (data.value?.body) {
+    widgets.value = data.value.body.widgets;
+    resetLayout();
+    return data.value.body;
   }
 };
 

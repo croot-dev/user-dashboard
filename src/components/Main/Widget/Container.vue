@@ -131,6 +131,9 @@ const handleUpdateSetting = (settingData: any) => {
   updateWidget(props.tabId, props.data.id, body)
     .then(() => {
       toast.show({ message: 'widget updated' });
+    })
+    .catch((error) => {
+      toast.show({ message: error.message, color: 'error' });
     });
 };
 </script>
